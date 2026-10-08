@@ -1,0 +1,5 @@
+module CIrufus [system] {
+    header "irufus.h"
+    link "irufus_engine"
+    export *
+}

@@ -1,0 +1,5 @@
+/build/
+/engine/target/
+/app/.build/
+.DS_Store
+*.swp
