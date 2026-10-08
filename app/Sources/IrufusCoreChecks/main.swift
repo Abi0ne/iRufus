@@ -27,6 +27,11 @@ import Foundation
     let p = PlannerTests()
     run("planner: inconsistent configurations", p.issuesBlockInconsistentConfigurations)
     run("planner: Windows request", p.windowsRequestOnlyContainsApplicableOptions)
+    let u = UpdateTests()
+    run("updates: version ordering", u.versionsCompareNumerically)
+    run("updates: release feed", u.releaseFeedIsParsedStrictly)
+    run("updates: signature", u.onlyPackagesSignedWithTheKeyAreAccepted)
+    run("updates: staged bundle", u.stagedBundleIsValidated)
     if failures.isEmpty {
         print("All IrufusCore checks passed")
         exit(0)

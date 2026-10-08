@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.2 — 2026-10-08
+- Aggiornamenti automatici dalle release GitHub di Abi0ne/iRufus: controllo giornaliero, download,
+  verifica della firma Ed25519 e sostituzione dell'app alla chiusura (o con "Riavvia ora").
+  Nuova scheda *Impostazioni › Aggiornamenti* e voce di menu "Controlla aggiornamenti…".
+- La barra di avanzamento ora si muove anche mentre `install.wim` viene diviso in parti (prima restava
+  ferma per diversi minuti e poi saltava in avanti).
+- Icona dell'app: quella di Rufus (pubblico dominio).
+
 ## 0.1.1 — 2026-10-08
 - Interfaccia ridisegnata con la disposizione di Rufus: "Opzioni unità", "Opzioni formattazione", "Stato",
   opzioni avanzate a scomparsa, barra di stato grande (PRONTO), icone in basso, AVVIA/CHIUDI, barra inferiore.

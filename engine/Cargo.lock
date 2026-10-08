@@ -198,7 +198,7 @@ dependencies = [
 
 [[package]]
 name = "irufus_engine"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "bzip2",
  "crc32fast",

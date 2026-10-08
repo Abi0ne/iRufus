@@ -10,6 +10,7 @@ struct IRufusApp: App {
     var body: some Scene {
         Window("iRufus", id: "main") {
             MainView()
+                .modifier(UpdateAlert())
                 .environment(model)
                 .onAppear { delegate.model = model }
         }
@@ -38,6 +39,10 @@ struct AppCommands: Commands {
     @Environment(\.openWindow) private var openWindow
 
     var body: some Commands {
+        CommandGroup(after: .appInfo) {
+            Button("Check for Updates…") { Task { await model.checkForUpdates(userInitiated: true) } }
+                .disabled(model.update.isWorking)
+        }
         CommandGroup(after: .newItem) {
             Button("Refresh Devices") { model.refreshDevices() }
                 .keyboardShortcut("r", modifiers: [.command])
@@ -50,6 +55,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     weak var model: AppModel?
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { true }
+
+    @MainActor
+    func applicationWillTerminate(_ notification: Notification) {
+        model?.installStagedUpdateOnQuit()
+    }
 
     @MainActor
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {

@@ -46,7 +46,8 @@ Disk Arbitration, IOKit, Authorization Services e `authopen` sono disponibili da
 ## Permessi
 - L'app **non** è in sandbox: deve accedere a `/dev/rdiskN` tramite `authopen`.
 - Hardened Runtime attivo, nessuna entitlement speciale.
-- Nessun accesso a rete, fotocamera, contatti, ecc. Il permesso "Accesso completo al disco" non serve.
+- Unico accesso di rete: il controllo degli aggiornamenti su GitHub (vedi SICUREZZA.md). Nessun accesso a
+  fotocamera, contatti, ecc. Il permesso "Accesso completo al disco" non serve.
 - Al momento della scrittura macOS mostra la richiesta di password di amministratore (Authorization
   Services) con il nome del disco.
 
@@ -61,6 +62,29 @@ spctl -a -vv build/iRufus.app
 ```
 Con firma ad-hoc l'app funziona sul Mac che l'ha compilata; per distribuirla serve Developer ID +
 notarizzazione (altrimenti Gatekeeper la blocca).
+
+## Release e aggiornamenti automatici
+iRufus si aggiorna dalle release GitHub di `Abi0ne/iRufus`. Ogni release deve contenere
+`iRufus-<versione>.zip` e `iRufus-<versione>.zip.sig` (firma Ed25519); il tag è `v<versione>` e la
+versione è quella di `engine/Cargo.toml`.
+
+```bash
+# una sola volta: chiave di firma (già creata in ~/.config/irufus/update-ed25519.key)
+swift scripts/update-signing.swift genkey ~/.config/irufus/update-ed25519.key
+#   → stampa la chiave pubblica da copiare in UpdateFeed.publicKey (app/Sources/IrufusCore/Updates.swift)
+
+# per ogni versione: aggiornare version in engine/Cargo.toml e CHANGELOG.md, poi
+scripts/make-release.sh                  # o --universal
+gh release create v<versione> --repo Abi0ne/iRufus --title "iRufus <versione>" --notes-file note.md build/release/*
+```
+**Conservare una copia della chiave privata** in un posto sicuro: se va persa, le versioni installate
+non accetteranno più aggiornamenti (bisognerà installare a mano una versione con una nuova chiave).
+Se viene rubata, chiunque può pubblicare aggiornamenti accettati: cambiare chiave e pubblicare subito
+una versione che la incorpora.
+
+Il pacchetto scaricato da iRufus non riceve l'attributo di quarantena, quindi anche con firma ad-hoc
+l'aggiornamento si avvia. La prima installazione scaricata dal browser invece è in quarantena: con firma
+ad-hoc va aperta con clic destro › Apri (o serve Developer ID + notarizzazione).
 
 ## Distribuzione e GPL
 iRufus è GPL-3.0-or-later. Chi distribuisce il binario deve fornire il sorgente corrispondente:

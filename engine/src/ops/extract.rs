@@ -283,6 +283,9 @@ pub fn write_iso_extract(
                     .rsplit_once('/')
                     .map(|(d, _)| d.to_string())
                     .unwrap_or_default();
+                // Progress is reported in source bytes, capped at the WIM size
+                // (each part also repeats the header, blob table and XML).
+                let mut wim_done = 0u64;
                 for part in 1..=split.part_count() {
                     let name = wim::part_name("install", part);
                     let dest = if dir.is_empty() {
@@ -296,11 +299,11 @@ pub fn write_iso_extract(
                         hasher: Sha256::new(),
                         count: 0,
                     };
-                    let mut src_bytes = 0u64;
                     wim::write_part(&split, part, &mut src, &mut hw, ctx, &mut |n| {
-                        src_bytes += n;
+                        let step = n.min(e.size - wim_done);
+                        wim_done += step;
+                        tracker.advance(step);
                     })?;
-                    tracker.advance(src_bytes.min(e.size));
                     let digest = hex(&hw.hasher.finalize());
                     let count = hw.count;
                     if let Some(ts) = e.mtime {

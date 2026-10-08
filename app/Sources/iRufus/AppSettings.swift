@@ -9,6 +9,8 @@ struct AppSettings: Equatable {
     var binaryUnits = false
     var defaultHashes: Set<HashAlgorithm> = [.sha256]
     var excludedDevices: [String: String] = [:] // identityKey → display name
+    var checkForUpdates = true
+    var installUpdatesAutomatically = true
 
     private enum Key {
         static let usbHDD = "showUSBHardDrives"
@@ -17,6 +19,8 @@ struct AppSettings: Equatable {
         static let binary = "binaryUnits"
         static let hashes = "defaultHashes"
         static let excluded = "excludedDevices"
+        static let checkUpdates = "checkForUpdates"
+        static let installUpdates = "installUpdatesAutomatically"
     }
 
     static func load(_ d: UserDefaults = .standard) -> AppSettings {
@@ -30,6 +34,8 @@ struct AppSettings: Equatable {
             s.defaultHashes = set.isEmpty ? [.sha256] : set
         }
         s.excludedDevices = d.dictionary(forKey: Key.excluded) as? [String: String] ?? [:]
+        s.checkForUpdates = d.object(forKey: Key.checkUpdates) as? Bool ?? true
+        s.installUpdatesAutomatically = d.object(forKey: Key.installUpdates) as? Bool ?? true
         return s
     }
 
@@ -40,5 +46,7 @@ struct AppSettings: Equatable {
         d.set(binaryUnits, forKey: Key.binary)
         d.set(defaultHashes.map(\.rawValue).sorted(), forKey: Key.hashes)
         d.set(excludedDevices, forKey: Key.excluded)
+        d.set(checkForUpdates, forKey: Key.checkUpdates)
+        d.set(installUpdatesAutomatically, forKey: Key.installUpdates)
     }
 }

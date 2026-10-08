@@ -62,7 +62,20 @@ entro la partizione, rilevamento di cicli. Il motore non esegue mai contenuti de
 Il panic Rust non attraversa l'FFI (`catch_unwind` → `IRUFUS_ERR_INTERNAL`).
 
 ## Rete
-iRufus non scarica nulla: il menu "Scarica" apre solo la pagina ufficiale Microsoft nel browser.
+Il menu "Scarica" apre solo la pagina ufficiale Microsoft nel browser. L'unico accesso di rete di iRufus
+è il controllo degli aggiornamenti (disattivabile in *Impostazioni › Aggiornamenti*):
+- al massimo una volta al giorno legge `https://api.github.com/repos/Abi0ne/iRufus/releases/latest`
+  (sessione effimera: niente cookie né cache; nessun dato inviato oltre all'indirizzo IP e allo user agent
+  `iRufus/<versione>`);
+- scarica `iRufus-<versione>.zip` e `.zip.sig` solo via HTTPS, con limite di 200 MiB;
+- installa il pacchetto solo se la firma Ed25519 corrisponde alla chiave pubblica incorporata
+  (`UpdateFeed.publicKey`); la chiave privata resta fuori dal repository (`~/.config/irufus`);
+- dopo l'estrazione controlla identificativo del bundle, versione uguale a quella della release (niente
+  ritorno a versioni precedenti) ed eseguibile, poi `codesign --verify --deep --strict`;
+- non installa mai durante un'operazione: l'app viene sostituita alla chiusura o con "Riavvia ora";
+  se lo spostamento fallisce viene ripristinata la versione precedente;
+- rifiuta di aggiornarsi se macOS esegue l'app da una posizione temporanea (App Translocation) o se la
+  cartella non è scrivibile.
 
 ## Log
 - La cartella Inizio diventa `~`, `/Users/<nome>/` diventa `/Users/<user>/`, il nome dell'account

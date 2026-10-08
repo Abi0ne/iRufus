@@ -79,6 +79,10 @@ final class AppModel {
     private(set) var logEntries: [LogEntry] = []
     private(set) var lastBadBlocks: BadBlocksReport?
 
+    // Updates (AppModel+Updates.swift)
+    var update = UpdateStatus()
+    @ObservationIgnored var stagedUpdate: (app: URL, target: URL)?
+
     var settings: AppSettings {
         didSet {
             settings.save()
@@ -87,7 +91,7 @@ final class AppModel {
     }
 
     @ObservationIgnored private var diskService: DiskService?
-    @ObservationIgnored private let log = LogStore()
+    @ObservationIgnored let log = LogStore()
     @ObservationIgnored private var cancelHandle: CancelHandle?
     @ObservationIgnored private var hashCancel: CancelHandle?
     @ObservationIgnored private var analysisGeneration = 0
@@ -99,6 +103,7 @@ final class AppModel {
         hash.algorithms = settings.defaultHashes
         log.onAppend = { [weak self] e in self?.logEntries.append(e) }
         log.add("iRufus \(Self.appVersion), engine \(Engine.version) (ABI \(Engine.abiVersion)), macOS \(ProcessInfo.processInfo.operatingSystemVersionString)")
+        checkForUpdatesAtLaunch()
         guard Engine.abiVersion == 1 else {
             log.add("Engine ABI mismatch", level: .error)
             operation = .failed(String(localized: "The storage engine does not match this version of iRufus."))

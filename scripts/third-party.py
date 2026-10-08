@@ -29,6 +29,7 @@ out += ["", "## Note", "",
         "- **fatfs 0.3.6** (MIT) è incluso in `engine/vendor/fatfs` con una patch documentata in `engine/vendor/README.md`.",
         "- **liblzma** (0BSD / pubblico dominio), **zstd** (BSD-3-Clause) e **libbzip2** (licenza bzip2, tipo BSD) sono compilati staticamente dai crate `*-sys`.",
         "- La logica e i contenuti del file di risposta Windows sono portati da **Rufus** (GPL-3.0-or-later, © Pete Batard / Akeo Consulting).",
+        "- L'icona dell'applicazione (`app/Resources/AppIcon.icns`) è l'icona di **Rufus** (`res/icons/rufus-512.png`), di pubblico dominio, per gentile concessione di PC Unleashed.",
         "- Strumenti usati solo nei test e non distribuiti: `wimlib-imagex` (GPL-3.0-or-later), `hdiutil` e `fsck_msdos` di macOS.",
         "- Nessun binario Microsoft, firmware, boot loader (GRUB, Syslinux, FreeDOS, UEFI:NTFS) o script remoto è incluso o scaricato."]
 (ROOT / "THIRD_PARTY_LICENSES.md").write_text("\n".join(out) + "\n")

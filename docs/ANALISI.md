@@ -69,7 +69,7 @@ Lo stato effettivo a fine implementazione, con i test associati, è mantenuto in
 | 36 | Download ISO Windows (Fido) | PowerShell remoto firmato | Fido è PowerShell e Microsoft blocca spesso l'accesso automatizzato; si apre la pagina ufficiale Microsoft | 🔁 |
 | 37 | Download UEFI Shell | GitHub pbatard/UEFI-Shell | Rinviato (serve DB di hash fissati come in Rufus) | 🕓 |
 | 38 | Controllo DBX / SBAT revocati | DB embedded + download UEFI.org | Rinviato | 🕓 |
-| 39 | Controllo aggiornamenti | rufus.ie firmato | Rinviato (nessun canale firmato ancora) | 🕓 |
+| 39 | Controllo aggiornamenti | rufus.ie firmato | Release GitHub `Abi0ne/iRufus` con pacchetto firmato Ed25519, installazione automatica alla chiusura | 🔁 |
 | 40 | Log, salvataggio log | finestra log | Pannello log con esportazione; nessun dato sensibile (username WUE mascherato) | ✅ |
 | 41 | Impostazioni persistenti | registro / ini | `UserDefaults` | ✅ |
 | 42 | Tema chiaro/scuro | darkmode.c | Nativo SwiftUI | ✅ |

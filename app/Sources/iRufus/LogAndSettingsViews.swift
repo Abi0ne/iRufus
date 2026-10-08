@@ -1,3 +1,4 @@
+import AppKit
 import IrufusCore
 import SwiftUI
 import UniformTypeIdentifiers
@@ -108,10 +109,117 @@ struct SettingsView: View {
             .formStyle(.grouped)
             .tabItem { Label("General", systemImage: "gearshape") }
 
+            UpdateSettingsView()
+                .tabItem { Label("Updates", systemImage: "arrow.down.circle") }
+
             AboutView()
                 .tabItem { Label("About", systemImage: "info.circle") }
         }
         .frame(width: 520, height: 460)
+    }
+}
+
+struct UpdateSettingsView: View {
+    @Environment(AppModel.self) private var model
+
+    var body: some View {
+        @Bindable var model = model
+        Form {
+            Section {
+                Toggle("Check for updates automatically", isOn: $model.settings.checkForUpdates)
+                Toggle("Download and install updates automatically", isOn: $model.settings.installUpdatesAutomatically)
+                Text("iRufus checks GitHub (\(UpdateFeed.repository)) at most once a day. Updates are installed only if they are signed with the iRufus release key, and never while an operation is running: a downloaded update replaces the app when you quit iRufus.")
+                    .font(.caption).foregroundStyle(.secondary)
+            }
+            Section {
+                HStack {
+                    statusText
+                    Spacer()
+                    if model.update.isWorking {
+                        ProgressView().controlSize(.small)
+                    }
+                    if case .ready = model.update.phase {
+                        Button("Restart and Install") { model.installUpdateNow() }
+                            .disabled(model.isBusy)
+                    } else if case .available(let release) = model.update.phase {
+                        Button("Download and Install") { Task { await model.downloadUpdate(release) } }
+                    } else {
+                        Button("Check Now") { Task { await model.checkForUpdates(userInitiated: false) } }
+                            .disabled(model.update.isWorking)
+                    }
+                }
+                if let last = model.update.lastCheck {
+                    Text("Last check: \(last.formatted(date: .abbreviated, time: .shortened))")
+                        .font(.caption).foregroundStyle(.secondary)
+                }
+            }
+        }
+        .formStyle(.grouped)
+    }
+
+    @ViewBuilder private var statusText: some View {
+        switch model.update.phase {
+        case .idle: Text("Version \(AppModel.appVersion)")
+        case .checking: Text("Checking for updates…")
+        case .upToDate: Text("iRufus \(AppModel.appVersion) is up to date.")
+        case .available(let r): Text("iRufus \(r.version.description) is available.")
+        case .downloading(let r): Text("Downloading iRufus \(r.version.description)…")
+        case .ready(let r): Text("iRufus \(r.version.description) is ready to install.")
+        case .failed(let message): Text(message).foregroundStyle(.red)
+        }
+    }
+}
+
+struct UpdateAlert: ViewModifier {
+    @Environment(AppModel.self) private var model
+
+    func body(content: Content) -> some View {
+        @Bindable var model = model
+        content.alert(title, isPresented: $model.update.showAlert) {
+            switch model.update.phase {
+            case .available(let release):
+                Button("Download and Install") { Task { await model.downloadUpdate(release) } }
+                Button("Release Notes") { NSWorkspace.shared.open(release.pageURL) }
+                Button("Later", role: .cancel) {}
+            case .ready:
+                if !model.isBusy {
+                    Button("Restart Now") { model.installUpdateNow() }
+                }
+                Button("Later", role: .cancel) {}
+            default:
+                Button("OK", role: .cancel) {}
+            }
+        } message: {
+            Text(message)
+        }
+    }
+
+    private var title: String {
+        switch model.update.phase {
+        case .available(let r): String(localized: "iRufus \(r.version.description) is available")
+        case .ready(let r): String(localized: "iRufus \(r.version.description) is ready to install")
+        case .upToDate: String(localized: "iRufus is up to date")
+        case .failed: String(localized: "Update failed")
+        default: ""
+        }
+    }
+
+    private var message: String {
+        switch model.update.phase {
+        case .available(let r):
+            let notes = r.notes.count > 600 ? String(r.notes.prefix(600)) + "…" : r.notes
+            return notes.isEmpty ? String(localized: "You have version \(AppModel.appVersion).") : notes
+        case .ready:
+            return model.isBusy
+                ? String(localized: "It will be installed when you quit iRufus, after the current operation.")
+                : String(localized: "Restart now, or it will be installed when you quit iRufus.")
+        case .upToDate:
+            return String(localized: "You have the latest version (\(AppModel.appVersion)).")
+        case .failed(let message):
+            return message
+        default:
+            return ""
+        }
     }
 }
 

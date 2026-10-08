@@ -67,7 +67,8 @@ Legenda: **✅ Supportata** · **🔁 Implementazione diversa** · **⚠️ Limi
 | Azzeramento dispositivo con verifica | ✅ | | R: dd |
 | Salva dispositivo in .img / .vhd | ✅ | Accesso in sola lettura; il file non può stare sul disco letto | R: save |
 | Download ISO Windows | 🔁 | Apre la pagina ufficiale Microsoft; nessuno script remoto | — |
-| Download UEFI Shell, controllo DBX/SBAT, aggiornamenti automatici | 🕓 | Nascosti | — |
+| Aggiornamenti automatici da GitHub (Abi0ne/iRufus) | 🔁 | Pacchetto firmato Ed25519; sostituzione dell'app alla chiusura o con "Riavvia ora" | S: updates |
+| Download UEFI Shell, controllo DBX/SBAT | 🕓 | Nascosti | — |
 | Log consultabile ed esportabile, senza dati personali | ✅ | | S: log |
 | Impostazioni persistenti, tema chiaro/scuro (sistema), unità binarie/decimali | ✅ | | M-1 |
 | Localizzazione | ⚠️ | Italiano e inglese | `scripts/localization.py check` |

@@ -1,3 +1,4 @@
+import CryptoKit
 import Foundation
 @testable import IrufusCore
 
@@ -291,5 +292,97 @@ struct PlannerTests {
         var dd = o
         dd.mode = .dd
         expect(WritePlanner.request(options: dd, report: report(modes: [.dd, .isoExtract], windows: win11), locale: nil).wue == nil)
+    }
+}
+
+/// Update feed parsing, signature checks and package staging (no network).
+struct UpdateTests {
+    func versionsCompareNumerically() {
+        expect(AppVersion("0.1.10")! > AppVersion("0.1.9")!)
+        expect(AppVersion("v1.0")! == AppVersion("1.0.0")!)
+        expect(AppVersion("0.2.0")! > AppVersion("0.1.99")!)
+        expect(AppVersion("1.0-beta") == nil)
+        expect(AppVersion("dev") == nil)
+        expect(AppVersion("") == nil)
+    }
+
+    func releaseJSON(tag: String, assets: [String], prerelease: Bool = false) -> Data {
+        let list = assets.map {
+            #"{"name":"\#($0)","size":1234,"browser_download_url":"https://github.com/Abi0ne/iRufus/releases/download/\#(tag)/\#($0)"}"#
+        }.joined(separator: ",")
+        let json = #"{"tag_name":"\#(tag)","html_url":"https://github.com/Abi0ne/iRufus/releases/tag/\#(tag)","body":"Notes","draft":false,"prerelease":\#(prerelease),"assets":[\#(list)]}"#
+        return Data(json.utf8)
+    }
+
+    func releaseFeedIsParsedStrictly() throws {
+        let r = try UpdateFeed.parseLatestRelease(releaseJSON(
+            tag: "v0.2.0", assets: ["iRufus-0.2.0-source.tar.gz", "iRufus-0.2.0.zip", "iRufus-0.2.0.zip.sig"]))
+        expect(r.version == AppVersion("0.2.0")!)
+        expect(r.archiveURL.lastPathComponent == "iRufus-0.2.0.zip")
+        expect(r.signatureURL.lastPathComponent == "iRufus-0.2.0.zip.sig")
+        expect(r.notes == "Notes")
+        expectThrows(UpdateError.self) {
+            _ = try UpdateFeed.parseLatestRelease(releaseJSON(tag: "v0.2.0", assets: ["iRufus-0.2.0.zip"]))
+        }
+        expectThrows(UpdateError.self) {
+            _ = try UpdateFeed.parseLatestRelease(releaseJSON(
+                tag: "v0.2.0", assets: ["iRufus-0.2.0.zip", "iRufus-0.2.0.zip.sig"], prerelease: true))
+        }
+        expectThrows(UpdateError.self) { _ = try UpdateFeed.parseLatestRelease(Data("{}".utf8)) }
+    }
+
+    func onlyPackagesSignedWithTheKeyAreAccepted() {
+        let key = Curve25519.Signing.PrivateKey()
+        let pub = key.publicKey.rawRepresentation.base64EncodedString()
+        let archive = Data("iRufus package".utf8)
+        let sig = Data(try! key.signature(for: archive).base64EncodedString().utf8 + [0x0A])
+        expect(UpdateFeed.verify(archive: archive, signature: sig, publicKey: pub))
+        expect(!UpdateFeed.verify(archive: archive + Data([0]), signature: sig, publicKey: pub))
+        expect(!UpdateFeed.verify(archive: archive, signature: sig))  // embedded release key
+        expect(!UpdateFeed.verify(archive: archive, signature: Data("garbage".utf8), publicKey: pub))
+    }
+
+    func fakeApp(in dir: URL, id: String, version: String) throws -> URL {
+        let app = dir.appendingPathComponent("iRufus.app")
+        let macos = app.appendingPathComponent("Contents/MacOS")
+        try FileManager.default.createDirectory(at: macos, withIntermediateDirectories: true)
+        let info: [String: Any] = ["CFBundleIdentifier": id, "CFBundleShortVersionString": version,
+                                   "CFBundleExecutable": "iRufus", "CFBundlePackageType": "APPL"]
+        try PropertyListSerialization.data(fromPropertyList: info, format: .xml, options: 0)
+            .write(to: app.appendingPathComponent("Contents/Info.plist"))
+        try FileManager.default.copyItem(atPath: "/usr/bin/true", toPath: macos.appendingPathComponent("iRufus").path)
+        try UpdateInstaller.run("/usr/bin/codesign", ["--force", "--sign", "-", app.path])
+        return app
+    }
+
+    func stagedBundleIsValidated() throws {
+        let fm = FileManager.default
+        let work = fm.temporaryDirectory.appendingPathComponent("irufus-update-\(UUID().uuidString)")
+        defer { try? fm.removeItem(at: work) }
+        let src = work.appendingPathComponent("src")
+        let installed = work.appendingPathComponent("installed")
+        try fm.createDirectory(at: src, withIntermediateDirectories: true)
+        try fm.createDirectory(at: installed, withIntermediateDirectories: true)
+        let target = try fakeApp(in: installed, id: "io.example.iRufus", version: "0.1.0")
+        expect(try UpdateInstaller.installationTarget(target) == target)
+
+        let app = try fakeApp(in: src, id: "io.example.iRufus", version: "0.2.0")
+        let zip = work.appendingPathComponent("iRufus-0.2.0.zip")
+        try UpdateInstaller.run("/usr/bin/ditto", ["-c", "-k", "--keepParent", app.path, zip.path])
+        let staged = try UpdateInstaller.stage(archive: zip, version: AppVersion("0.2.0")!, target: target,
+                                               bundleID: "io.example.iRufus")
+        expect(staged.lastPathComponent == "iRufus.app")
+        try? fm.removeItem(at: staged.deletingLastPathComponent())
+        expectThrows(UpdateError.self) {
+            _ = try UpdateInstaller.stage(archive: zip, version: AppVersion("0.3.0")!, target: target,
+                                          bundleID: "io.example.iRufus")
+        }
+        expectThrows(UpdateError.self) {
+            _ = try UpdateInstaller.stage(archive: zip, version: AppVersion("0.2.0")!, target: target,
+                                          bundleID: "io.example.other")
+        }
+        expectThrows(UpdateError.self) {
+            _ = try UpdateInstaller.installationTarget(URL(fileURLWithPath: "/private/var/folders/x/AppTranslocation/y/iRufus.app"))
+        }
     }
 }
