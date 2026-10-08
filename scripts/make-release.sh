@@ -2,6 +2,7 @@
 # Build the files of a GitHub release into build/release/:
 #   iRufus-<version>.zip       the app, installed by iRufus' automatic updates
 #   iRufus-<version>.zip.sig   Ed25519 signature of the zip (checked before installing)
+#   iRufus-<version>.dmg       drag-to-install disk image for manual downloads
 #   iRufus-<version>-source.tar.gz   corresponding source (GPL section 6)
 # Arguments are passed to build-app.sh (e.g. --universal).
 # Environment:
@@ -27,6 +28,7 @@ ZIP="$OUT/iRufus-$VERSION.zip"
 ditto -c -k --keepParent "$ROOT/build/iRufus.app" "$ZIP"
 swift "$SIGNING" sign "$KEY" "$ZIP" > "$ZIP.sig"
 swift "$SIGNING" verify "$EMBEDDED" "$ZIP" "$(cat "$ZIP.sig")"
+"$ROOT/scripts/make-dmg.sh" > /dev/null
 mv "$("$ROOT/scripts/make-source-archive.sh")" "$OUT/"
 
 echo
