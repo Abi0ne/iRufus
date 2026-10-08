@@ -38,12 +38,15 @@ def extract_keys():
          "-Xswiftc", "-emit-localized-strings", "-Xswiftc", "-emit-localized-strings-path", "-Xswiftc", str(out)],
         check=True, env=sdk_env(), stdout=subprocess.DEVNULL)
     keys = {}
+    # Where the .stringsdata files land depends on the build system (flat in `out` with the
+    # native one, under the target's build folder with swiftbuild): filter on the source path.
     for f in build.rglob("*.stringsdata"):
-        if "iRufus" not in str(f.parent) or "IrufusCore" in str(f.parent):
-            continue
         data = json.loads(f.read_text())
+        source = pathlib.Path(data.get("source", ""))
+        if source.parent.name != "iRufus":
+            continue
         for entry in data.get("tables", {}).get("Localizable", []):
-            keys.setdefault(entry["key"], f"{f.stem}.swift:{entry['location']['startingLine']}")
+            keys.setdefault(entry["key"], f"{source.name}:{entry['location']['startingLine']}")
     return keys
 
 
