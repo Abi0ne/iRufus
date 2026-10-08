@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.1 — 2026-10-08
+- Interfaccia ridisegnata con la disposizione di Rufus: "Opzioni unità", "Opzioni formattazione", "Stato",
+  opzioni avanzate a scomparsa, barra di stato grande (PRONTO), icone in basso, AVVIA/CHIUDI, barra inferiore.
+- Pulsante ✓ per i checksum e menu SELEZIONA ▾ (selezione file, pagine ufficiali Windows).
+- Opzioni Windows in una finestra dopo AVVIA, come la "Windows User Experience" di Rufus.
+- Test dei blocchi difettosi opzionale prima della scrittura (1/2/4 passaggi).
+
 ## 0.1.0 — 2026-10-08
 Prima versione.
 - Motore Rust: ISO 9660/Joliet/Rock Ridge/UDF/El Torito, WIM, MBR/GPT; gz/xz/zstd/bz2/zip, VHD fisso.

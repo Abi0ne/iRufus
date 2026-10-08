@@ -11,10 +11,9 @@ struct IRufusApp: App {
         Window("iRufus", id: "main") {
             MainView()
                 .environment(model)
-                .frame(minWidth: 580, idealWidth: 620, minHeight: 680, idealHeight: 820)
                 .onAppear { delegate.model = model }
         }
-        .windowResizability(.contentMinSize)
+        .windowResizability(.contentSize)
         .commands {
             CommandGroup(replacing: .newItem) {}
             AppCommands(model: model)

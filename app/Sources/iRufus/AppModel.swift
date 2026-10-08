@@ -6,7 +6,8 @@ import Observation
 /// A destructive (or read-only) operation waiting for user confirmation.
 struct PendingOperation: Identifiable {
     enum Kind: Equatable {
-        case write
+        /// Write the image; optionally run a destructive bad-blocks test first (Rufus option).
+        case write(badBlocksPasses: UInt32?)
         case badBlocks(passes: UInt32)
         case zero
         case save(URL, Engine.SaveFormat)
@@ -64,6 +65,13 @@ final class AppModel {
 
     // Checksums
     var hash = HashState()
+    var showChecksum = false
+
+    // Rufus-style advanced format options and the Windows dialog shown after START
+    var badBlocksBeforeWrite = false
+    var badBlocksPasses: UInt32 = 1
+    var showWindowsDialog = false
+    private(set) var statusMessage = ""
 
     // Operation
     private(set) var operation: OperationState = .idle
@@ -155,6 +163,10 @@ final class AppModel {
     private func devicesChanged(_ list: [DiskDevice]) {
         let before = Set(devices.filter(\.isSelectable).map(\.id))
         devices = list
+        if !isBusy {
+            let n = list.filter(\.isSelectable).count
+            statusMessage = n == 1 ? String(localized: "1 device found") : String(localized: "\(n) devices found")
+        }
         let after = Set(list.filter(\.isSelectable).map(\.id))
         for id in after.subtracting(before) {
             if let d = list.first(where: { $0.id == id }) {
@@ -330,9 +342,26 @@ final class AppModel {
 
     // MARK: - Operations
 
+    /// START: like Rufus, Windows images first show the customisation dialog.
+    func startPressed() {
+        guard canStart else { return }
+        if windowsOptionsAvailable {
+            showWindowsDialog = true
+        } else {
+            requestWrite()
+        }
+    }
+
+    func windowsDialogFinished(proceed: Bool) {
+        showWindowsDialog = false
+        guard proceed else { return }
+        requestWrite()
+    }
+
     func requestWrite() {
         guard canStart, let d = selectedDevice else { return }
-        pending = PendingOperation(kind: .write, facts: d.facts, identity: DiskIdentity(d.facts), level: ConfirmationLevel.required(for: d.facts))
+        let kind = PendingOperation.Kind.write(badBlocksPasses: badBlocksBeforeWrite ? badBlocksPasses : nil)
+        pending = PendingOperation(kind: kind, facts: d.facts, identity: DiskIdentity(d.facts), level: ConfirmationLevel.required(for: d.facts))
     }
 
     func requestAdvanced(_ kind: PendingOperation.Kind) {
@@ -357,7 +386,7 @@ final class AppModel {
         guard let ds = diskService else { return }
         let request: WriteRequest?
         let imagePath = imageURL?.path
-        if op.kind == .write {
+        if case .write = op.kind {
             guard let report, let options, let imagePath else { return }
             request = WritePlanner.request(options: options, report: report, locale: LocaleSettings.current())
             if let name = request?.wue?.localAccount { log.registerSecret(name) }
@@ -424,6 +453,7 @@ final class AppModel {
             switch outcome {
             case .success(let message):
                 operation = .succeeded(message)
+                statusMessage = message
                 log.add(message)
                 if kind.isDestructive {
                     try? await Task.sleep(for: .seconds(1))
@@ -432,6 +462,7 @@ final class AppModel {
             case .failure(let e):
                 if (e as? EngineError)?.code == .cancelled {
                     operation = .cancelled
+                    statusMessage = String(localized: "Cancelled. The device content is incomplete and must be rewritten or erased.")
                     log.add("Operation cancelled; the device content is incomplete", level: .warning)
                 } else if let b = e as? BrokerError, b == .authorizationDenied {
                     operation = .failed(String(localized: "Administrator authorization was cancelled. Nothing was written."))
@@ -446,14 +477,21 @@ final class AppModel {
 
     private func fail(_ message: String, diag: String) {
         operation = .failed(message)
+        statusMessage = message
         log.add("Operation failed: \(diag)", level: .error)
     }
 
     nonisolated private static func execute(_ kind: PendingOperation.Kind, device: EngineDevice, imagePath: String?, request: WriteRequest?,
                                             observer: EngineObserver, cancel: CancelHandle) throws -> String {
         switch kind {
-        case .write:
+        case .write(let passes):
             guard let imagePath, let request else { throw EngineError(code: .invalidArgument, message: "no image") }
+            if let passes {
+                let r = try Engine.badBlocks(device: device, passes: passes, observer: observer, cancel: cancel)
+                if r.badSectors > 0 {
+                    throw EngineError(code: .badBlocksFound, message: "\(r.badSectors) bad sectors, fake capacity suspected: \(r.fakeCapacitySuspected)")
+                }
+            }
             switch try Engine.write(device: device, imagePath: imagePath, request: request, observer: observer, cancel: cancel) {
             case .dd(let s):
                 return s.verified
@@ -486,7 +524,7 @@ final class AppModel {
 
     static func title(for kind: PendingOperation.Kind) -> String {
         switch kind {
-        case .write: String(localized: "Writing")
+        case .write(let passes): passes == nil ? String(localized: "Writing") : String(localized: "Checking blocks and writing")
         case .zero: String(localized: "Erasing")
         case .badBlocks: String(localized: "Checking for bad blocks")
         case .save: String(localized: "Saving image")

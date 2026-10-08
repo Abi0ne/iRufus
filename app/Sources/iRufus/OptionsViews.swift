@@ -1,145 +1,137 @@
 import IrufusCore
 import SwiftUI
 
-struct OptionsSection: View {
+/// Opened by the ✓ button next to the boot selection, like Rufus' checksum dialog.
+struct ChecksumSheet: View {
     @Environment(AppModel.self) private var model
+    @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         @Bindable var model = model
-        if let report = model.report, let options = model.options {
-            Section {
-                if report.modes.count > 1 {
-                    Picker("Write mode", selection: Binding(
-                        get: { options.mode },
-                        set: { model.options?.mode = $0 })) {
-                        ForEach(report.modes, id: \.self) { m in
-                            Text(modeName(m)).tag(m)
-                        }
-                    }
-                    .help("DD copies the image bit for bit. ISO mode creates a FAT32 partition and copies the files, so the drive stays usable for data.")
-                } else if let only = report.modes.first {
-                    LabeledContent("Write mode", value: modeName(only))
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Checksums").font(.title2.bold())
+            Text(model.imageURL?.lastPathComponent ?? "").foregroundStyle(.secondary).lineLimit(1).truncationMode(.middle)
+            HStack {
+                ForEach(HashAlgorithm.allCases) { a in
+                    Toggle(a.displayName, isOn: Binding(
+                        get: { model.hash.algorithms.contains(a) },
+                        set: { on in if on { model.hash.algorithms.insert(a) } else { model.hash.algorithms.remove(a) } }))
                 }
-                Text(modeExplanation(options.mode))
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-
-                if options.mode == .isoExtract {
-                    Picker("Partition scheme", selection: Binding(
-                        get: { options.scheme },
-                        set: { model.options?.scheme = $0 })) {
-                        Text("GPT").tag(PartitionScheme.gpt)
-                        Text("MBR").tag(PartitionScheme.mbr)
-                    }
-                    .pickerStyle(.segmented)
-                    Text(options.scheme == .gpt
-                         ? "GPT: recommended for UEFI PCs made after 2012 and for disks over 2 TB."
-                         : "MBR: for older UEFI firmware that does not boot GPT USB drives. Still UEFI only.")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                    LabeledContent("File system", value: "FAT32")
-                        .help("FAT32 is the file system every UEFI firmware must read. NTFS, exFAT and ext are not offered: macOS cannot create them reliably for bootable media.")
-                    if let f = model.fat32 {
-                        Picker("Cluster size", selection: Binding(
-                            get: { options.clusterSize ?? f.default },
-                            set: { model.options?.clusterSize = $0 == f.default ? nil : $0 })) {
-                            ForEach(f.valid, id: \.self) { c in
-                                Text(c == f.default ? String(localized: "\(model.formatBytes(UInt64(c))) (default)") : model.formatBytes(UInt64(c))).tag(c)
+                Spacer()
+                if model.hash.running {
+                    Button("Stop") { model.cancelHashes() }
+                } else {
+                    Button("Compute") { model.computeHashes() }
+                        .disabled(model.hash.algorithms.isEmpty)
+                        .keyboardShortcut(.defaultAction)
+                }
+            }
+            .toggleStyle(.checkbox)
+            if model.hash.running {
+                ProgressView(value: model.hash.progress ?? 0).accessibilityLabel(Text("Checksum progress"))
+            }
+            if let r = model.hash.result {
+                Grid(alignment: .leading, horizontalSpacing: 10, verticalSpacing: 4) {
+                    ForEach(HashAlgorithm.allCases) { a in
+                        if let v = r.value(for: a) {
+                            GridRow {
+                                Text(a.displayName).foregroundStyle(.secondary)
+                                Text(v).font(.system(.caption, design: .monospaced)).textSelection(.enabled)
                             }
                         }
                     }
-                    TextField("Volume label", text: Binding(
-                        get: { options.label },
-                        set: { model.options?.label = $0 }))
-                        .help("FAT labels are limited to 11 characters; invalid characters are replaced. Linux boot files referencing the ISO label are updated to match.")
                 }
-                LabeledContent("Target system") {
-                    let targets = WritePlanner.targets(report: report, mode: options.mode)
-                    Text(targets.isEmpty ? String(localized: "Unknown — the image may not boot") : targets.map(targetName).joined(separator: ", "))
-                }
-                Toggle("Verify by reading back after writing", isOn: Binding(
-                    get: { options.verify },
-                    set: { model.options?.verify = $0 }))
-                    .help("Reads the written data back from the device and compares it. Doubles the time but detects faulty or counterfeit drives.")
-                ForEach(issueTexts, id: \.self) { t in
-                    Label(t, systemImage: "exclamationmark.triangle").foregroundStyle(.orange).font(.callout)
-                }
-            } header: {
-                Text("Format options")
+            }
+            TextField("Expected checksum (paste from the official site)", text: $model.hash.expected)
+                .font(.system(.body, design: .monospaced))
+                .textFieldStyle(.roundedBorder)
+            comparison
+            Text("A matching checksum proves the file is intact (integrity). It proves authenticity only if the expected value comes from the publisher's official, secure page or a verified signature.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+            HStack {
+                Spacer()
+                Button("Close") { dismiss() }.keyboardShortcut(.cancelAction)
             }
         }
+        .padding(20)
+        .frame(width: 600)
     }
 
-    func modeExplanation(_ m: WriteMode) -> String {
-        switch m {
-        case .dd: String(localized: "The whole device is replaced by the image, including its partition table. Remaining space is not usable until the drive is reformatted.")
-        case .isoExtract: String(localized: "Creates one FAT32 partition and copies the ISO content. Bootable on UEFI firmware only.")
-        }
-    }
-
-    var issueTexts: [String] {
-        model.planIssues.compactMap { issue in
-            switch issue {
-            case .noDevice, .noImage, .deviceNotSelectable: nil
-            case .modeUnavailable: String(localized: "The selected mode is not available for this image.")
-            case .imageLargerThanDevice(let needed, let available):
-                String(localized: "The device is too small: \(model.formatBytes(needed)) needed, \(model.formatBytes(available)) available.")
-            case .deviceTooSmallForFat32: String(localized: "The device is too small for a FAT32 partition.")
-            case .schemeRequired: String(localized: "Choose a partition scheme.")
-            case .answerFileConflict: String(localized: "The ISO already contains an answer file.")
-            case .invalidAccountName: String(localized: "The local account name is not valid.")
-            }
+    @ViewBuilder
+    var comparison: some View {
+        switch model.checksumComparison {
+        case .empty: EmptyView()
+        case .unparseable:
+            Label("Not a valid MD5, SHA-1, SHA-256 or SHA-512 value", systemImage: "questionmark.circle").foregroundStyle(.orange)
+        case .notComputed(let a):
+            Label("Compute \(a.displayName) to compare", systemImage: "info.circle").foregroundStyle(.secondary)
+        case .match(let a):
+            Label("\(a.displayName) matches", systemImage: "checkmark.seal.fill").foregroundStyle(.green)
+        case .mismatch(let a):
+            Label("\(a.displayName) does NOT match: do not use this image", systemImage: "xmark.seal.fill").foregroundStyle(.red)
         }
     }
 }
 
-struct WindowsSection: View {
+/// Shown after START for Windows images, like Rufus' "Windows User Experience" dialog.
+struct WindowsDialog: View {
     @Environment(AppModel.self) private var model
     @State private var preview: AnswerFilePreview?
 
     var body: some View {
-        if let report = model.report, let options = model.options, let w = report.iso?.windows {
-            Section {
-                Toggle("Customise Windows installation", isOn: Binding(
-                    get: { options.wueEnabled },
-                    set: { model.options?.wueEnabled = $0 }))
-                if options.wueEnabled {
-                    Group {
-                        if w.isWindows11 {
-                            toggle("Remove the requirement for TPM 2.0, Secure Boot and 4 GB RAM", \.bypassRequirements,
-                                   help: "Adds LabConfig registry values during Windows Setup. Works when booting from this USB drive (clean install), not for upgrades started from Windows.")
-                        }
-                        toggle("Remove the requirement for an online Microsoft account", \.noOnlineAccount,
-                               help: "Sets BypassNRO. Incompatible with PCs locked in Windows S Mode.")
-                        toggle("Create a local account", \.createLocalAccount,
-                               help: "The account is created with an empty password; Windows asks to set one at first sign-in.")
-                        if options.wue.createLocalAccount {
-                            TextField("Account name", text: Binding(
-                                get: { options.wue.accountName },
-                                set: { model.options?.wue.accountName = $0 }))
-                            if let err = model.accountNameError {
-                                Text(err).font(.caption).foregroundStyle(.red)
-                            }
-                        }
-                        toggle("Disable data collection (skip privacy questions)", \.disableDataCollection, help: nil)
-                        toggle("Use this Mac's regional settings", \.copyRegionalSettings,
-                               help: "Language, locale and keyboard; the time zone is not copied. The ISO must include the language.")
-                        toggle("Disable automatic BitLocker device encryption", \.disableBitlocker, help: nil)
-                    }
-                    .padding(.leading, 12)
-                    Button("Show answer file…") { preview = model.answerFilePreview() }
-                        .disabled(model.answerFilePreview() == nil)
+        let w = model.report?.iso?.windows
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Windows User Experience").font(.title2.bold())
+            Text("Customise Windows installation?")
+            Group {
+                if w?.isWindows11 == true {
+                    toggle("Remove the requirement for TPM 2.0, Secure Boot and 4 GB RAM", \.bypassRequirements,
+                           help: "Adds LabConfig registry values during Windows Setup. Works when booting from this USB drive (clean install), not for upgrades started from Windows.")
                 }
-                Text("These options are written as a Windows Setup answer file on the USB drive (Autounattend.xml or sources/$OEM$). They act only during installation from this drive and only on Windows images that honour them; iRufus cannot verify their effect on the target PC.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            } header: {
-                Text("Windows customisation")
+                toggle("Remove the requirement for an online Microsoft account", \.noOnlineAccount,
+                       help: "Sets BypassNRO. Incompatible with PCs locked in Windows S Mode.")
+                HStack {
+                    toggle("Create a local account with username:", \.createLocalAccount,
+                           help: "The account is created with an empty password; Windows asks to set one at first sign-in.")
+                    TextField("Account name", text: Binding(
+                        get: { model.options?.wue.accountName ?? "" },
+                        set: { model.options?.wue.accountName = $0 }))
+                        .textFieldStyle(.roundedBorder)
+                        .labelsHidden()
+                        .disabled(model.options?.wue.createLocalAccount != true)
+                }
+                if model.options?.wue.createLocalAccount == true, let err = model.accountNameError {
+                    Text(err).font(.caption).foregroundStyle(.red)
+                }
+                toggle("Disable data collection (skip privacy questions)", \.disableDataCollection, help: nil)
+                toggle("Use this Mac's regional settings", \.copyRegionalSettings,
+                       help: "Language, locale and keyboard; the time zone is not copied. The ISO must include the language.")
+                toggle("Disable automatic BitLocker device encryption", \.disableBitlocker, help: nil)
             }
-            .sheet(item: $preview) { p in
-                AnswerFileView(preview: p)
+            .toggleStyle(.checkbox)
+            Text("These options are written as a Windows Setup answer file on the USB drive (Autounattend.xml or sources/$OEM$). They act only during installation from this drive and only on Windows images that honour them; iRufus cannot verify their effect on the target PC.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+            HStack {
+                Button("Show answer file…") { preview = model.answerFilePreview() }
+                    .disabled(model.answerFilePreview() == nil)
+                Spacer()
+                Button("Cancel") { model.windowsDialogFinished(proceed: false) }
+                    .keyboardShortcut(.cancelAction)
+                Button("OK") {
+                    model.options?.wueEnabled = true
+                    model.windowsDialogFinished(proceed: true)
+                }
+                .keyboardShortcut(.defaultAction)
+                .disabled(model.options?.wue.createLocalAccount == true && model.accountNameError != nil)
             }
         }
+        .padding(20)
+        .frame(width: 560)
+        .sheet(item: $preview) { AnswerFileView(preview: $0) }
     }
 
     func toggle(_ title: LocalizedStringKey, _ key: WritableKeyPath<WueSelection, Bool>, help: LocalizedStringKey?) -> some View {
@@ -174,5 +166,19 @@ struct AnswerFileView: View {
         }
         .padding()
         .frame(width: 640, height: 480)
+    }
+}
+
+struct AboutSheet: View {
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        VStack(alignment: .trailing) {
+            AboutView()
+            Button("Close") { dismiss() }
+                .keyboardShortcut(.defaultAction)
+                .padding([.trailing, .bottom])
+        }
+        .frame(width: 520, height: 360)
     }
 }
