@@ -1,13 +1,15 @@
 # Changelog
 
-## Non rilasciato
-- Nuova finestra "Scarica un sistema operativo" (menu SELEZIONA ▾): Windows 11 x64 e Arm (ultima versione, lingua
-  a scelta, verificata con lo SHA-256 pubblicato da Microsoft), Ubuntu Desktop (ultima LTS), SystemRescue
-  (live di soccorso) e FreeDOS 1.4 USB Lite/Full dai server degli editori, con pausa/ripresa e cartella di destinazione a scelta. L'immagine viene
-  usata solo dopo la verifica SHA-256: per Ubuntu il checksum viene da `SHA256SUMS` con firma OpenPGP verificata
-  con la chiave Ubuntu incorporata, per SystemRescue si verifica anche la firma OpenPGP della ISO stessa, per FreeDOS
-  è fissato in iRufus. Un file già presente viene verificato invece
-  di essere scaricato di nuovo.
+## 0.1.3 — 2026-10-10
+- Nuova finestra "Scarica un sistema operativo" (menu SELEZIONA ▾) che scarica dai server degli editori:
+  - **Windows 11** x64 e Arm, ultima versione (oggi 26H2), lingua a scelta, verificata con lo SHA-256 che Microsoft
+    pubblica sulla pagina di download. Se Microsoft rifiuta la richiesta (errore 715-123130) si apre la sua pagina;
+  - **Ubuntu Desktop**, ultima LTS: SHA-256 da `SHA256SUMS` con firma OpenPGP verificata (chiave Ubuntu incorporata);
+  - **SystemRescue**, live di soccorso: firma OpenPGP della ISO stessa verificata dopo il download;
+  - **FreeDOS 1.4** USB Lite/Full: SHA-256 fissato in iRufus.
+- L'immagine prende il nome finale solo dopo la verifica; pausa e ripresa, cartella di destinazione a scelta,
+  controllo dello spazio libero; un file già presente viene verificato invece di essere scaricato di nuovo.
+- Kali Live non è offerta: Kali la distribuisce solo via BitTorrent.
 
 ## 0.1.2 — 2026-10-08
 - Aggiornamenti automatici dalle release GitHub di Abi0ne/iRufus: controllo giornaliero, download,
