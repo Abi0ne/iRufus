@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.4 — 2026-10-10
+- Finestra "Scarica un sistema operativo" riordinata: FreeDOS Lite (predefinito), FreeDOS Full, SystemRescue,
+  Ubuntu, Windows 11. Aprendola non si contatta più Microsoft.
+- Windows 11 è una voce sola: quando è selezionata compaiono la scelta dell'architettura (x64 o Arm64) e della lingua.
+- La scelta e la cartella si possono cambiare anche mentre si cerca la versione (prima il cambio poteva essere ignorato).
+- Le voci dell'elenco hanno etichetta e descrizione per VoiceOver.
+
 ## 0.1.3 — 2026-10-10
 - Nuova finestra "Scarica un sistema operativo" (menu SELEZIONA ▾) che scarica dai server degli editori:
   - **Windows 11** x64 e Arm, ultima versione (oggi 26H2), lingua a scelta, verificata con lo SHA-256 che Microsoft
