@@ -11,7 +11,14 @@ struct DownloadSheet: View {
     var body: some View {
         @Bindable var model = model
         let phase = model.download.phase
-        let locked = model.download.isWorking || { if case .paused = phase { return true } else { return false } }()
+        // The choice can change while a version is being looked up (the last one wins),
+        // not while a download is in progress, paused or being verified.
+        let locked: Bool = {
+            switch phase {
+            case .downloading, .paused, .verifying: return true
+            default: return false
+            }
+        }()
         VStack(alignment: .leading, spacing: 12) {
             Text("Download an Operating System").font(.title2.bold())
             Text("Images come from the publisher's own server and are used only after their SHA-256 checksum has been verified.")
@@ -19,32 +26,33 @@ struct DownloadSheet: View {
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
 
-            Picker("Operating system", selection: $model.download.product) {
-                ForEach(DownloadProduct.allCases) { p in
+            // Windows 11 is one entry; its architecture is chosen below.
+            Picker("Operating system", selection: Binding(
+                get: { model.download.product == .windows11ARM ? .windows11 : model.download.product },
+                set: { p in
+                    guard p != (model.download.product == .windows11ARM ? .windows11 : model.download.product) else { return }
+                    model.download.product = p
+                    model.resolveDownload()
+                })) {
+                ForEach(Self.choices) { p in
                     VStack(alignment: .leading, spacing: 1) {
                         Text(productName(p))
                         Text(productSummary(p)).font(.caption).foregroundStyle(.secondary)
                             .fixedSize(horizontal: false, vertical: true)
                     }
                     .padding(.vertical, 2)
+                    .accessibilityElement(children: .ignore)
+                    .accessibilityLabel(Text(productName(p)))
+                    .accessibilityHint(Text(productSummary(p)))
                     .tag(p)
                 }
             }
             .pickerStyle(.radioGroup)
             .labelsHidden()
             .disabled(locked)
-            .onChange(of: model.download.product) { model.resolveDownload() }
 
-            if model.download.product.family == .windows, !model.download.windowsLanguages.isEmpty {
-                Picker("Language", selection: Binding(
-                    get: { model.download.windowsLanguage ?? "" },
-                    set: { model.download.windowsLanguage = $0; model.resolveDownload() })) {
-                    ForEach(model.download.windowsLanguages) { l in
-                        Text(l.localizedName).tag(l.name)
-                    }
-                }
-                .disabled(locked)
-                .frame(maxWidth: 320)
+            if model.download.product.family == .windows {
+                windowsOptions.disabled(locked)
             }
 
             Divider()
@@ -71,6 +79,50 @@ struct DownloadSheet: View {
         }
         .padding(20)
         .frame(width: 560)
+    }
+
+    /// Architecture and language, shown only when Windows 11 is selected.
+    private var windowsOptions: some View {
+        Grid(alignment: .leading, horizontalSpacing: 10, verticalSpacing: 8) {
+            GridRow {
+                Text("Architecture").foregroundStyle(.secondary)
+                Picker("Architecture", selection: Binding(
+                    get: { model.download.product },
+                    set: { p in
+                        guard p != model.download.product else { return }
+                        model.download.product = p
+                        model.resolveDownload()
+                    })) {
+                    Text("x64 (Intel/AMD)").tag(DownloadProduct.windows11)
+                    Text("Arm64 (Snapdragon…)").tag(DownloadProduct.windows11ARM)
+                }
+                .pickerStyle(.segmented)
+                .labelsHidden()
+                .fixedSize()
+            }
+            GridRow {
+                Text("Language").foregroundStyle(.secondary)
+                if model.download.windowsLanguages.isEmpty {
+                    Text("Available after contacting Microsoft…").foregroundStyle(.secondary)
+                } else {
+                    Picker("Language", selection: Binding(
+                        get: { model.download.windowsLanguage ?? "" },
+                        set: { l in
+                            guard l != model.download.windowsLanguage else { return }
+                            model.download.windowsLanguage = l
+                            model.resolveDownload()
+                        })) {
+                        ForEach(model.download.windowsLanguages) { l in
+                            Text(l.localizedName).tag(l.name)
+                        }
+                    }
+                    .labelsHidden()
+                    .frame(maxWidth: 280)
+                }
+            }
+        }
+        .font(.callout)
+        .padding(.leading, 20)
     }
 
     @ViewBuilder
@@ -222,10 +274,12 @@ struct DownloadSheet: View {
         }
     }
 
+    /// Entries of the list, in this order; the Arm build of Windows is chosen with `windowsOptions`.
+    static let choices: [DownloadProduct] = [.freeDOSLite, .freeDOSFull, .systemRescue, .ubuntuDesktop, .windows11]
+
     private func productName(_ p: DownloadProduct) -> String {
         switch p {
-        case .windows11: String(localized: "Windows 11 (64-bit PCs)")
-        case .windows11ARM: String(localized: "Windows 11 for Arm")
+        case .windows11, .windows11ARM: String(localized: "Windows 11 (latest version)")
         case .ubuntuDesktop: String(localized: "Ubuntu Desktop (latest LTS)")
         case .systemRescue: String(localized: "SystemRescue (latest)")
         case .freeDOSLite: String(localized: "FreeDOS 1.4 — USB Lite")
@@ -235,10 +289,8 @@ struct DownloadSheet: View {
 
     private func productSummary(_ p: DownloadProduct) -> String {
         switch p {
-        case .windows11:
-            String(localized: "Official multi-edition ISO (Home, Pro, Education…) from Microsoft, latest version. Intel/AMD PCs, about 9 GB.")
-        case .windows11ARM:
-            String(localized: "For PCs with Arm processors (Snapdragon and others). About 8.5 GB.")
+        case .windows11, .windows11ARM:
+            String(localized: "Official multi-edition ISO (Home, Pro, Education…) from Microsoft, for Intel/AMD or Arm PCs, in the language you choose. About 9 GB.")
         case .ubuntuDesktop:
             String(localized: "Live system: try Ubuntu without installing it, rescue files, or install it. 64-bit PCs, about 6 GB.")
         case .systemRescue:

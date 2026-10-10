@@ -33,8 +33,11 @@
 "All data on this device will be destroyed" = "Tutti i dati su questo dispositivo verranno distrutti";
 "An operation is in progress" = "Un'operazione è in corso";
 "Analysing image…" = "Analisi dell'immagine…";
+"Architecture" = "Architettura";
+"Arm64 (Snapdragon…)" = "Arm64 (Snapdragon…)";
 "As Lite, with all FreeDOS packages (editors, compilers, games, networking). About 670 MB." = "Come Lite, con tutti i pacchetti FreeDOS (editor, compilatori, giochi, rete). Circa 670 MB.";
 "Attached disk image (enable in Settings)" = "Immagine disco collegata (attivabile nelle Impostazioni)";
+"Available after contacting Microsoft…" = "Disponibile dopo aver contattato Microsoft…";
 "BIOS (or UEFI-CSM)" = "BIOS (o UEFI-CSM)";
 "BIOS / legacy (CSM)" = "BIOS / legacy (CSM)";
 "BIOS or UEFI" = "BIOS o UEFI";
@@ -131,7 +134,6 @@
 "FAT32 is the file system every UEFI firmware must read. NTFS, exFAT and ext are not offered: macOS cannot create them reliably for bootable media." = "FAT32 è il file system che ogni firmware UEFI deve saper leggere. NTFS, exFAT ed ext non sono proposti: macOS non può crearli in modo affidabile per supporti avviabili.";
 "File" = "File";
 "File system" = "File system";
-"For PCs with Arm processors (Snapdragon and others). About 8.5 GB." = "Per PC con processore Arm (Snapdragon e altri). Circa 8,5 GB.";
 "For additional safety, type the device identifier (%@) to continue:" = "Per maggiore sicurezza, digita l'identificatore del dispositivo (%@) per continuare:";
 "Format Options" = "Opzioni formattazione";
 "FreeDOS 1.4 — USB Full" = "FreeDOS 1.4 — USB Full";
@@ -184,7 +186,7 @@
 "Not identified with enough certainty" = "Non identificato con sufficiente certezza";
 "OK" = "OK";
 "Off by default, like in Rufus: external hard drives often hold backups." = "Disattivato per impostazione predefinita, come in Rufus: i dischi esterni contengono spesso backup.";
-"Official multi-edition ISO (Home, Pro, Education…) from Microsoft, latest version. Intel/AMD PCs, about 9 GB." = "ISO ufficiale multi-edizione (Home, Pro, Education…) di Microsoft, ultima versione. PC Intel/AMD, circa 9 GB.";
+"Official multi-edition ISO (Home, Pro, Education…) from Microsoft, for Intel/AMD or Arm PCs, in the language you choose. About 9 GB." = "ISO ufficiale multi-edizione (Home, Pro, Education…) di Microsoft, per PC Intel/AMD o Arm, nella lingua che scegli. Circa 9 GB.";
 "Only removable devices that can be safely identified are listed." = "Vengono elencati solo i dispositivi rimovibili identificabili con certezza.";
 "Open Microsoft's Page" = "Apri la pagina Microsoft";
 "Operating system" = "Sistema operativo";
@@ -306,8 +308,7 @@
 "Version %@" = "Versione %@";
 "Virtual APFS container" = "Contenitore APFS virtuale";
 "Volume label" = "Etichetta volume";
-"Windows 11 (64-bit PCs)" = "Windows 11 (PC a 64 bit)";
-"Windows 11 for Arm" = "Windows 11 per Arm";
+"Windows 11 (latest version)" = "Windows 11 (ultima versione)";
 "Windows User Experience" = "Esperienza utente Windows";
 "Windows answer file added." = "File di risposta di Windows aggiunto.";
 "Write in DD image mode" = "Scrivi in modalità immagine DD";
@@ -349,4 +350,5 @@
 "verifying" = "verifica";
 "writing" = "scrittura";
 "writing zeros" = "scrittura di zeri";
+"x64 (Intel/AMD)" = "x64 (Intel/AMD)";
 "—" = "—";

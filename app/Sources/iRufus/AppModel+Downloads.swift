@@ -17,7 +17,7 @@ struct DownloadStatus: Equatable {
         case failed(String)
     }
 
-    var product: DownloadProduct = .windows11
+    var product: DownloadProduct = .freeDOSLite
     /// Windows: Microsoft's English name of the language to download; nil until known.
     var windowsLanguage: String?
     /// Languages Microsoft offered at the last lookup, for the picker.
@@ -58,7 +58,10 @@ extension AppModel {
 
     /// Look up the current version and checksum of the selected product.
     func resolveDownload() {
-        guard !download.isWorking else { return }
+        switch download.phase {
+        case .downloading, .verifying: return
+        default: break  // a lookup in progress is superseded (downloadGeneration)
+        }
         if case .paused = download.phase { discardPartialDownload() }
         downloadGeneration += 1
         let generation = downloadGeneration
@@ -87,7 +90,10 @@ extension AppModel {
     }
 
     func chooseDownloadFolder(_ url: URL) {
-        guard !download.isWorking else { return }
+        switch download.phase {
+        case .downloading, .verifying: return
+        default: break
+        }
         if case .paused = download.phase { discardPartialDownload() }
         download.folder = url
         if download.resolved != nil { resolveDownload() }

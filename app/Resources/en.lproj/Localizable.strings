@@ -8,9 +8,9 @@
 "%@ does NOT match: do not use this image" = "%@ does NOT match: do not use this image";
 /* MainView.swift:696 */
 "%@ is %@: FAT32 cannot store files over 4 GB, so ISO mode is not available." = "%@ is %@: FAT32 cannot store files over 4 GB, so ISO mode is not available.";
-/* DownloadViews.swift:86 */
+/* DownloadViews.swift:135 */
 "%@ is already in this folder: it will be verified instead of downloaded again." = "%@ is already in this folder: it will be verified instead of downloaded again.";
-/* DownloadViews.swift:207 */
+/* DownloadViews.swift:256 */
 "%@ left" = "%@ left";
 /* OptionsViews.swift:71 */
 "%@ matches" = "%@ matches";
@@ -42,7 +42,7 @@
 "4 passes (0xAA, 0x55, 0xFF, 0x00)" = "4 passes (0xAA, 0x55, 0xFF, 0x00)";
 /* MainView.swift:229 */
 "?" = "?";
-/* DownloadViews.swift:69 */
+/* DownloadViews.swift:74 */
 "A download in progress continues in the background." = "A download in progress continues in the background.";
 /* LogAndSettingsViews.swift:232 */
 "A macOS port of the functions of Rufus by Pete Batard / Akeo Consulting (https://rufus.ie), licensed under the GNU General Public License v3 or later." = "A macOS port of the functions of Rufus by Pete Batard / Akeo Consulting (https://rufus.ie), licensed under the GNU General Public License v3 or later.";
@@ -66,10 +66,16 @@
 "An operation is in progress" = "An operation is in progress";
 /* MainView.swift:184 */
 "Analysing image…" = "Analysing image…";
-/* DownloadViews.swift:249 */
+/* DownloadViews.swift:85 */
+"Architecture" = "Architecture";
+/* DownloadViews.swift:94 */
+"Arm64 (Snapdragon…)" = "Arm64 (Snapdragon…)";
+/* DownloadViews.swift:298 */
 "As Lite, with all FreeDOS packages (editors, compilers, games, networking). About 670 MB." = "As Lite, with all FreeDOS packages (editors, compilers, games, networking). About 670 MB.";
 /* MainView.swift:642 */
 "Attached disk image (enable in Settings)" = "Attached disk image (enable in Settings)";
+/* DownloadViews.swift:103 */
+"Available after contacting Microsoft…" = "Available after contacting Microsoft…";
 /* MainView.swift:287 */
 "BIOS (or UEFI-CSM)" = "BIOS (or UEFI-CSM)";
 /* MainView.swift:661 */
@@ -102,7 +108,7 @@
 "Cancelled. The device content is incomplete and must be rewritten or erased." = "Cancelled. The device content is incomplete and must be rewritten or erased.";
 /* MainView.swift:341 */
 "Capacity" = "Capacity";
-/* DownloadViews.swift:60 */
+/* DownloadViews.swift:65 */
 "Change…" = "Change…";
 /* LogAndSettingsViews.swift:147 */
 "Check Now" = "Check Now";
@@ -124,15 +130,15 @@
 "Checking for updates…" = "Checking for updates…";
 /* MainView.swift:163 */
 "Checksum" = "Checksum";
-/* DownloadViews.swift:145 */
+/* DownloadViews.swift:194 */
 "Checksum list signed by %@" = "Checksum list signed by %@";
-/* DownloadViews.swift:160 */
+/* DownloadViews.swift:209 */
 "Checksum of this release built into iRufus" = "Checksum of this release built into iRufus";
 /* OptionsViews.swift:31 */
 "Checksum progress" = "Checksum progress";
 /* OptionsViews.swift:12 */
 "Checksums" = "Checksums";
-/* DownloadViews.swift:219 */
+/* DownloadViews.swift:268 */
 "Choose" = "Choose";
 /* MainView.swift:570 */
 "Choose a partition scheme." = "Choose a partition scheme.";
@@ -166,7 +172,7 @@
 "Continue…" = "Continue…";
 /* AppModel+Updates.swift:166 */
 "Could not reach GitHub. Check your internet connection." = "Could not reach GitHub. Check your internet connection.";
-/* AppModel+Downloads.swift:313 */
+/* AppModel+Downloads.swift:319 */
 "Could not reach the publisher's server. Check your internet connection." = "Could not reach the publisher's server. Check your internet connection.";
 /* OptionsViews.swift:96 */
 "Create a local account with username:" = "Create a local account with username:";
@@ -178,7 +184,7 @@
 "DD mode is recommended for this Linux image: it keeps BIOS and UEFI boot exactly as designed by the distribution." = "DD mode is recommended for this Linux image: it keeps BIOS and UEFI boot exactly as designed by the distribution.";
 /* MainView.swift:300 */
 "DD mode keeps the boot methods designed by the image author." = "DD mode keeps the boot methods designed by the image author.";
-/* DownloadViews.swift:247 */
+/* DownloadViews.swift:296 */
 "DOS for BIOS/firmware updates and old programs; needs a PC with BIOS or CSM. About 17 MB." = "DOS for BIOS/firmware updates and old programs; needs a PC with BIOS or CSM. About 17 MB.";
 /* LogAndSettingsViews.swift:97 */
 "Default checksums" = "Default checksums";
@@ -194,7 +200,7 @@
 "Disable automatic BitLocker device encryption" = "Disable automatic BitLocker device encryption";
 /* OptionsViews.swift:108 */
 "Disable data collection (skip privacy questions)" = "Disable data collection (skip privacy questions)";
-/* DownloadViews.swift:185 */
+/* DownloadViews.swift:234 */
 "Discard" = "Discard";
 /* AppModel.swift:511 */
 "Done: %@ written (not verified)." = "Done: %@ written (not verified).";
@@ -208,19 +214,19 @@
 "Done: device saved to %@ (SHA-256 %@)." = "Done: device saved to %@ (SHA-256 %@).";
 /* AppModel.swift:522 */
 "Done: the device was overwritten with zeros and verified." = "Done: the device was overwritten with zeros and verified.";
-/* DownloadViews.swift:176 */
+/* DownloadViews.swift:225 */
 "Download" = "Download";
 /* MainView.swift:169 */
 "Download Windows 10 (official Microsoft page)" = "Download Windows 10 (official Microsoft page)";
 /* MainView.swift:167 */
 "Download Windows 11, Ubuntu, SystemRescue, FreeDOS…" = "Download Windows 11, Ubuntu, SystemRescue, FreeDOS…";
-/* DownloadViews.swift:16 */
+/* DownloadViews.swift:23 */
 "Download an Operating System" = "Download an Operating System";
 /* LogAndSettingsViews.swift:145 */
 "Download and Install" = "Download and Install";
 /* LogAndSettingsViews.swift:130 */
 "Download and install updates automatically" = "Download and install updates automatically";
-/* DownloadViews.swift:93 */
+/* DownloadViews.swift:142 */
 "Download progress" = "Download progress";
 /* LogAndSettingsViews.swift:166 */
 "Downloading iRufus %@…" = "Downloading iRufus %@…";
@@ -258,19 +264,17 @@
 "FAT labels are limited to 11 characters; invalid characters are replaced. Linux boot files referencing the ISO label are updated to match." = "FAT labels are limited to 11 characters; invalid characters are replaced. Linux boot files referencing the ISO label are updated to match.";
 /* MainView.swift:401 */
 "FAT32 is the file system every UEFI firmware must read. NTFS, exFAT and ext are not offered: macOS cannot create them reliably for bootable media." = "FAT32 is the file system every UEFI firmware must read. NTFS, exFAT and ext are not offered: macOS cannot create them reliably for bootable media.";
-/* DownloadViews.swift:124 */
+/* DownloadViews.swift:173 */
 "File" = "File";
 /* MainView.swift:395 */
 "File system" = "File system";
-/* DownloadViews.swift:241 */
-"For PCs with Arm processors (Snapdragon and others). About 8.5 GB." = "For PCs with Arm processors (Snapdragon and others). About 8.5 GB.";
 /* OperationViews.swift:64 */
 "For additional safety, type the device identifier (%@) to continue:" = "For additional safety, type the device identifier (%@) to continue:";
 /* MainView.swift:19 */
 "Format Options" = "Format Options";
-/* DownloadViews.swift:232 */
+/* DownloadViews.swift:283 */
 "FreeDOS 1.4 — USB Full" = "FreeDOS 1.4 — USB Full";
-/* DownloadViews.swift:231 */
+/* DownloadViews.swift:282 */
 "FreeDOS 1.4 — USB Lite" = "FreeDOS 1.4 — USB Lite";
 /* MainView.swift:277 */
 "From the image" = "From the image";
@@ -296,9 +300,9 @@
 "Identifier" = "Identifier";
 /* MainView.swift:194 */
 "Image option" = "Image option";
-/* DownloadViews.swift:153 */
+/* DownloadViews.swift:202 */
 "Image signed by %@" = "Image signed by %@";
-/* DownloadViews.swift:17 */
+/* DownloadViews.swift:24 */
 "Images come from the publisher's own server and are used only after their SHA-256 checksum has been verified." = "Images come from the publisher's own server and are used only after their SHA-256 checksum has been verified.";
 /* AppModel.swift:564 */
 "Input/output error. The device may be faulty or was removed." = "Input/output error. The device may be faulty or was removed.";
@@ -314,7 +318,7 @@
 "It will be installed when you quit iRufus, after the current operation." = "It will be installed when you quit iRufus, after the current operation.";
 /* iRufusApp.swift:71 */
 "Keep Working" = "Keep Working";
-/* DownloadViews.swift:39 */
+/* DownloadViews.swift:101 */
 "Language" = "Language";
 /* OptionsViews.swift:110 */
 "Language, locale and keyboard; the time zone is not copied. The ISO must include the language." = "Language, locale and keyboard; the time zone is not copied. The ISO must include the language.";
@@ -328,13 +332,13 @@
 "List USB hard drives and SSDs" = "List USB hard drives and SSDs";
 /* LogAndSettingsViews.swift:72 */
 "List attached disk images (for testing)" = "List attached disk images (for testing)";
-/* DownloadViews.swift:245 */
+/* DownloadViews.swift:294 */
 "Live rescue system: repair partitions and file systems, recover data, reset passwords, back up disks. 64-bit PCs, about 1.4 GB." = "Live rescue system: repair partitions and file systems, recover data, reset passwords, back up disks. 64-bit PCs, about 1.4 GB.";
-/* DownloadViews.swift:243 */
+/* DownloadViews.swift:292 */
 "Live system: try Ubuntu without installing it, rescue files, or install it. 64-bit PCs, about 6 GB." = "Live system: try Ubuntu without installing it, rescue files, or install it. 64-bit PCs, about 6 GB.";
 /* iRufusApp.swift:23 */
 "Log" = "Log";
-/* DownloadViews.swift:82 */
+/* DownloadViews.swift:131 */
 "Looking up the latest version…" = "Looking up the latest version…";
 /* MainView.swift:213 */
 "MBR" = "MBR";
@@ -342,7 +346,7 @@
 "MBR (from the image)" = "MBR (from the image)";
 /* MainView.swift:342 */
 "Manufacturer" = "Manufacturer";
-/* AppModel+Downloads.swift:301 */
+/* AppModel+Downloads.swift:307 */
 "Microsoft refused the download request (%@). Microsoft sometimes blocks automated downloads, VPNs and some networks: try again later, or download the ISO from Microsoft's page and select it." = "Microsoft refused the download request (%@). Microsoft sometimes blocks automated downloads, VPNs and some networks: try again later, or download the ISO from Microsoft's page and select it.";
 /* MainView.swift:343 */
 "Model" = "Model";
@@ -360,7 +364,7 @@
 "None" = "None";
 /* OptionsViews.swift:67 */
 "Not a valid MD5, SHA-1, SHA-256 or SHA-512 value" = "Not a valid MD5, SHA-1, SHA-256 or SHA-512 value";
-/* AppModel+Downloads.swift:309 */
+/* AppModel+Downloads.swift:315 */
 "Not enough free space: %@ needed, %@ available." = "Not enough free space: %@ needed, %@ available.";
 /* MainView.swift:634 */
 "Not identified with enough certainty" = "Not identified with enough certainty";
@@ -368,13 +372,13 @@
 "OK" = "OK";
 /* LogAndSettingsViews.swift:70 */
 "Off by default, like in Rufus: external hard drives often hold backups." = "Off by default, like in Rufus: external hard drives often hold backups.";
-/* DownloadViews.swift:239 */
-"Official multi-edition ISO (Home, Pro, Education…) from Microsoft, latest version. Intel/AMD PCs, about 9 GB." = "Official multi-edition ISO (Home, Pro, Education…) from Microsoft, latest version. Intel/AMD PCs, about 9 GB.";
+/* DownloadViews.swift:290 */
+"Official multi-edition ISO (Home, Pro, Education…) from Microsoft, for Intel/AMD or Arm PCs, in the language you choose. About 9 GB." = "Official multi-edition ISO (Home, Pro, Education…) from Microsoft, for Intel/AMD or Arm PCs, in the language you choose. About 9 GB.";
 /* MainView.swift:139 */
 "Only removable devices that can be safely identified are listed." = "Only removable devices that can be safely identified are listed.";
-/* DownloadViews.swift:196 */
+/* DownloadViews.swift:245 */
 "Open Microsoft's Page" = "Open Microsoft's Page";
-/* DownloadViews.swift:22 */
+/* DownloadViews.swift:30 */
 "Operating system" = "Operating system";
 /* OperationViews.swift:53 */
 "Operation" = "Operation";
@@ -386,9 +390,9 @@
 "Passes" = "Passes";
 /* OptionsViews.swift:155 */
 "Path on the USB drive: %@" = "Path on the USB drive: %@";
-/* DownloadViews.swift:179 */
+/* DownloadViews.swift:228 */
 "Pause" = "Pause";
-/* DownloadViews.swift:99 */
+/* DownloadViews.swift:148 */
 "Paused at %@" = "Paused at %@";
 /* LogAndSettingsViews.swift:30 */
 "Personal data (home folder, user name, Windows account name) is removed from the log." = "Personal data (home folder, user name, Windows account name) is removed from the log.";
@@ -422,11 +426,11 @@
 "Restart and Install" = "Restart and Install";
 /* LogAndSettingsViews.swift:215 */
 "Restart now, or it will be installed when you quit iRufus." = "Restart now, or it will be installed when you quit iRufus.";
-/* DownloadViews.swift:183 */
+/* DownloadViews.swift:232 */
 "Resume" = "Resume";
 /* MainView.swift:173 */
 "SELECT" = "SELECT";
-/* DownloadViews.swift:163 */
+/* DownloadViews.swift:212 */
 "SHA-256 published by Microsoft on its download page" = "SHA-256 published by Microsoft on its download page";
 /* MainView.swift:532 */
 "START" = "START";
@@ -436,7 +440,7 @@
 "Save device to image" = "Save device to image";
 /* MainView.swift:508 */
 "Save device to image…" = "Save device to image…";
-/* DownloadViews.swift:54 */
+/* DownloadViews.swift:59 */
 "Save to:" = "Save to:";
 /* AppModel.swift:542 */
 "Saving image" = "Saving image";
@@ -458,11 +462,11 @@
 "Show advanced format options" = "Show advanced format options";
 /* OptionsViews.swift:119 */
 "Show answer file…" = "Show answer file…";
-/* DownloadViews.swift:190 */
+/* DownloadViews.swift:239 */
 "Show in Finder" = "Show in Finder";
 /* LogAndSettingsViews.swift:73 */
 "Shows virtual disks attached with Disk Utility or hdiutil, useful to try iRufus without a USB drive." = "Shows virtual disks attached with Disk Utility or hdiutil, useful to try iRufus without a USB drive.";
-/* DownloadViews.swift:129 */
+/* DownloadViews.swift:178 */
 "Source" = "Source";
 /* MainView.swift:313 */
 "Standard Windows installation" = "Standard Windows installation";
@@ -470,7 +474,7 @@
 "Status" = "Status";
 /* OptionsViews.swift:22 */
 "Stop" = "Stop";
-/* DownloadViews.swift:230 */
+/* DownloadViews.swift:281 */
 "SystemRescue (latest)" = "SystemRescue (latest)";
 /* MainView.swift:220 */
 "Target system" = "Target system";
@@ -502,11 +506,11 @@
 "The device is too small: %@ needed, %@ available." = "The device is too small: %@ needed, %@ available.";
 /* AppModel.swift:571 */
 "The device was disconnected during the operation." = "The device was disconnected during the operation.";
-/* AppModel+Downloads.swift:315 */
+/* AppModel+Downloads.swift:321 */
 "The download failed: %@" = "The download failed: %@";
-/* AppModel+Downloads.swift:307 */
+/* AppModel+Downloads.swift:313 */
 "The downloaded file does not match the publisher's checksum and was deleted. Try again later." = "The downloaded file does not match the publisher's checksum and was deleted. Try again later.";
-/* AppModel+Downloads.swift:305 */
+/* AppModel+Downloads.swift:311 */
 "The downloaded image does not carry a valid signature from its publisher. Do not use it." = "The downloaded image does not carry a valid signature from its publisher. Do not use it.";
 /* AppModel+Updates.swift:158 */
 "The downloaded update is not signed with the iRufus key and was discarded." = "The downloaded update is not signed with the iRufus key and was discarded.";
@@ -522,9 +526,9 @@
 "The local account name is not valid." = "The local account name is not valid.";
 /* AppModel.swift:558 */
 "The opened device does not match the selected disk. Nothing was written." = "The opened device does not match the selected disk. Nothing was written.";
-/* AppModel+Downloads.swift:303 */
+/* AppModel+Downloads.swift:309 */
 "The publisher's checksum list does not carry a valid signature. The download was not started." = "The publisher's checksum list does not carry a valid signature. The download was not started.";
-/* AppModel+Downloads.swift:311 */
+/* AppModel+Downloads.swift:317 */
 "The publisher's site did not list the expected image. iRufus may need an update." = "The publisher's site did not list the expected image. iRufus may need an update.";
 /* AppModel.swift:441 */
 "The selected device changed or was disconnected. Nothing was written." = "The selected device changed or was disconnected. Nothing was written.";
@@ -562,7 +566,7 @@
 "This operation is not supported for this image." = "This operation is not supported for this image.";
 /* MainView.swift:517 */
 "Tools" = "Tools";
-/* DownloadViews.swift:194 */
+/* DownloadViews.swift:243 */
 "Try Again" = "Try Again";
 /* MainView.swift:662 */
 "UEFI" = "UEFI";
@@ -572,7 +576,7 @@
 "UEFI (non CSM)" = "UEFI (non CSM)";
 /* MainView.swift:641 */
 "USB hard drive (enable in Settings)" = "USB hard drive (enable in Settings)";
-/* DownloadViews.swift:229 */
+/* DownloadViews.swift:280 */
 "Ubuntu Desktop (latest LTS)" = "Ubuntu Desktop (latest LTS)";
 /* MainView.swift:288 */
 "Unknown" = "Unknown";
@@ -584,27 +588,27 @@
 "Updates" = "Updates";
 /* AppModel+Updates.swift:55 */
 "Updates are not available for development builds." = "Updates are not available for development builds.";
-/* DownloadViews.swift:187 */
+/* DownloadViews.swift:236 */
 "Use This Image" = "Use This Image";
 /* LogAndSettingsViews.swift:96 */
 "Use binary units (GiB instead of GB)" = "Use binary units (GiB instead of GB)";
 /* OptionsViews.swift:109 */
 "Use this Mac's regional settings" = "Use this Mac's regional settings";
-/* DownloadViews.swift:133 */
+/* DownloadViews.swift:182 */
 "Verification" = "Verification";
 /* AppModel.swift:572 */
 "Verification failed: the data read back differs. The device may be faulty or counterfeit." = "Verification failed: the data read back differs. The device may be faulty or counterfeit.";
-/* DownloadViews.swift:106 */
+/* DownloadViews.swift:155 */
 "Verified and saved to %@" = "Verified and saved to %@";
-/* DownloadViews.swift:176 */
+/* DownloadViews.swift:225 */
 "Verify" = "Verify";
 /* MainView.swift:424 */
 "Verify by reading back after writing" = "Verify by reading back after writing";
 /* LogAndSettingsViews.swift:95 */
 "Verify by reading back after writing (default)" = "Verify by reading back after writing (default)";
-/* DownloadViews.swift:103 */
+/* DownloadViews.swift:152 */
 "Verifying SHA-256…" = "Verifying SHA-256…";
-/* DownloadViews.swift:120 */
+/* DownloadViews.swift:169 */
 "Version" = "Version";
 /* LogAndSettingsViews.swift:162 */
 "Version %@" = "Version %@";
@@ -612,10 +616,8 @@
 "Virtual APFS container" = "Virtual APFS container";
 /* MainView.swift:385 */
 "Volume label" = "Volume label";
-/* DownloadViews.swift:227 */
-"Windows 11 (64-bit PCs)" = "Windows 11 (64-bit PCs)";
-/* DownloadViews.swift:228 */
-"Windows 11 for Arm" = "Windows 11 for Arm";
+/* DownloadViews.swift:279 */
+"Windows 11 (latest version)" = "Windows 11 (latest version)";
 /* OptionsViews.swift:86 */
 "Windows User Experience" = "Windows User Experience";
 /* AppModel.swift:517 */
@@ -698,5 +700,7 @@
 "writing" = "writing";
 /* OperationViews.swift:24 */
 "writing zeros" = "writing zeros";
+/* DownloadViews.swift:93 */
+"x64 (Intel/AMD)" = "x64 (Intel/AMD)";
 /* MainView.swift:415 */
 "—" = "—";

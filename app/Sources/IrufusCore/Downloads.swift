@@ -10,12 +10,12 @@
 import Foundation
 
 public enum DownloadProduct: String, CaseIterable, Identifiable, Sendable {
-    case windows11
-    case windows11ARM
-    case ubuntuDesktop
-    case systemRescue
     case freeDOSLite
     case freeDOSFull
+    case systemRescue
+    case ubuntuDesktop
+    case windows11
+    case windows11ARM
 
     public var id: String { rawValue }
 
