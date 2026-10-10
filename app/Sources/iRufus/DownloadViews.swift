@@ -6,6 +6,7 @@ import SwiftUI
 struct DownloadSheet: View {
     @Environment(AppModel.self) private var model
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.openURL) private var openURL
 
     var body: some View {
         @Bindable var model = model
@@ -33,6 +34,18 @@ struct DownloadSheet: View {
             .labelsHidden()
             .disabled(locked)
             .onChange(of: model.download.product) { model.resolveDownload() }
+
+            if model.download.product.family == .windows, !model.download.windowsLanguages.isEmpty {
+                Picker("Language", selection: Binding(
+                    get: { model.download.windowsLanguage ?? "" },
+                    set: { model.download.windowsLanguage = $0; model.resolveDownload() })) {
+                    ForEach(model.download.windowsLanguages) { l in
+                        Text(l.localizedName).tag(l.name)
+                    }
+                }
+                .disabled(locked)
+                .frame(maxWidth: 320)
+            }
 
             Divider()
             details(phase)
@@ -145,6 +158,14 @@ struct DownloadSheet: View {
             }
         case .pinnedChecksum:
             Text("Checksum of this release built into iRufus")
+        case .publishedChecksum(let page):
+            VStack(alignment: .leading, spacing: 2) {
+                Text("SHA-256 published by Microsoft on its download page")
+                Text(page.absoluteString)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .textSelection(.enabled)
+            }
         }
     }
 
@@ -171,6 +192,9 @@ struct DownloadSheet: View {
             }
         case .failed, .idle:
             Button("Try Again") { model.resolveDownload() }
+            if model.download.product.family == .windows {
+                Button("Open Microsoft's Page") { openURL(WindowsDownload.pageURL(model.download.product)) }
+            }
         }
     }
 
@@ -200,6 +224,8 @@ struct DownloadSheet: View {
 
     private func productName(_ p: DownloadProduct) -> String {
         switch p {
+        case .windows11: String(localized: "Windows 11 (64-bit PCs)")
+        case .windows11ARM: String(localized: "Windows 11 for Arm")
         case .ubuntuDesktop: String(localized: "Ubuntu Desktop (latest LTS)")
         case .systemRescue: String(localized: "SystemRescue (latest)")
         case .freeDOSLite: String(localized: "FreeDOS 1.4 — USB Lite")
@@ -209,6 +235,10 @@ struct DownloadSheet: View {
 
     private func productSummary(_ p: DownloadProduct) -> String {
         switch p {
+        case .windows11:
+            String(localized: "Official multi-edition ISO (Home, Pro, Education…) from Microsoft, latest version. Intel/AMD PCs, about 9 GB.")
+        case .windows11ARM:
+            String(localized: "For PCs with Arm processors (Snapdragon and others). About 8.5 GB.")
         case .ubuntuDesktop:
             String(localized: "Live system: try Ubuntu without installing it, rescue files, or install it. 64-bit PCs, about 6 GB.")
         case .systemRescue:

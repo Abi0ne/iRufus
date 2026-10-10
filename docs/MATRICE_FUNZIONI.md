@@ -66,7 +66,8 @@ Legenda: **✅ Supportata** · **🔁 Implementazione diversa** · **⚠️ Limi
 | Bad blocks distruttivo 1/2/4 passate + capacità contraffatta | ✅ | Avviso e conferma; durata lunga | R: badblocks (drive finto simulato) |
 | Azzeramento dispositivo con verifica | ✅ | | R: dd |
 | Salva dispositivo in .img / .vhd | ✅ | Accesso in sola lettura; il file non può stare sul disco letto | R: save |
-| Download ISO Windows | 🔁 | Apre la pagina ufficiale Microsoft; nessuno script remoto | — |
+| Download ISO Windows 11 (x64 e Arm, ultima versione, 38 lingue) | ✅ | Servizio di download Microsoft (stesso protocollo di Fido/Rufus); SHA-256 della lingua letto dalla pagina ufficiale; Microsoft può rifiutare la richiesta (715-123130): allora si apre la sua pagina | S: windows |
+| Download ISO Windows 10 | 🔁 | Apre la pagina ufficiale Microsoft | — |
 | Download Ubuntu Desktop (ultima LTS) | ✅ | Solo amd64; versione e SHA-256 da `SHA256SUMS` con firma OpenPGP verificata (chiave Ubuntu fissata); pausa/ripresa | S: downloads |
 | Download FreeDOS 1.4 USB Lite/Full | ✅ | SHA-256 fissato in iRufus (release fissa); immagine DD, solo BIOS/CSM | S: downloads |
 | Download SystemRescue (ultima versione) | ✅ | Solo amd64, versione ≥ 13.02; firma OpenPGP della ISO verificata dopo il download (sottochiave fissata) oltre allo SHA-256; pausa/ripresa | S: downloads |

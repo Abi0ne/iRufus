@@ -17,7 +17,11 @@ struct DownloadStatus: Equatable {
         case failed(String)
     }
 
-    var product: DownloadProduct = .ubuntuDesktop
+    var product: DownloadProduct = .windows11
+    /// Windows: Microsoft's English name of the language to download; nil until known.
+    var windowsLanguage: String?
+    /// Languages Microsoft offered at the last lookup, for the picker.
+    var windowsLanguages: [WindowsLanguage] = []
     var phase: Phase = .idle
     var folder: URL = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first
         ?? FileManager.default.homeDirectoryForCurrentUser
@@ -63,12 +67,17 @@ extension AppModel {
         log.add("Looking up \(product.rawValue) on \(product.publisherHost)")
         Task {
             do {
-                let d = try await DownloadCatalog.resolve(product, fetch: Self.fetchMetadata)
+                let language = product.family == .windows ? download.windowsLanguage : nil
+                let d = try await DownloadCatalog.resolve(product, language: language, fetch: Self.fetchMetadata)
                 let size = await Self.contentLength(d.url)
                 guard generation == downloadGeneration else { return }
                 let existing = (try? DownloadCatalog.destination(for: d, in: download.folder))
                     .map { FileManager.default.fileExists(atPath: $0.path) } ?? false
                 log.add("\(d.fileName) (\(d.version)), SHA-256 \(d.sha256), \(Self.describe(d.verification))")
+                if let l = d.language {
+                    download.windowsLanguage = l
+                    download.windowsLanguages = d.languages
+                }
                 download.phase = .ready(d, size: size, existing: existing)
             } catch {
                 guard generation == downloadGeneration else { return }
@@ -123,7 +132,9 @@ extension AppModel {
         downloadResumeData = nil
         let staging = download.folder.appendingPathComponent(".\(d.fileName).irufus-part")
         download.phase = .downloading(d, received: 0, total: expected, bytesPerSecond: 0)
-        log.add(resume == nil ? "Downloading \(d.url.absoluteString)" : "Resuming download of \(d.fileName)")
+        // Microsoft's links carry a temporary access token in the query: keep it out of the log.
+        let shown = d.url.absoluteString.components(separatedBy: "?")[0]
+        log.add(resume == nil ? "Downloading \(shown)" : "Resuming download of \(d.fileName)")
 
         let started = Date()
         var startBytes: Int64?
@@ -280,11 +291,14 @@ extension AppModel {
         case .signedChecksums(let name, let fp): "checksums signed by \(name) (\(fp))"
         case .signedImage(let name, let fp): "image signed by \(name) (\(fp))"
         case .pinnedChecksum: "checksum pinned in iRufus"
+        case .publishedChecksum(let page): "checksum published on \(page.absoluteString)"
         }
     }
 
     static func describeDownloadError(_ error: Error) -> String {
         switch error {
+        case DownloadError.refused(let code):
+            return String(localized: "Microsoft refused the download request (\(code)). Microsoft sometimes blocks automated downloads, VPNs and some networks: try again later, or download the ISO from Microsoft's page and select it.")
         case DownloadError.signature:
             return String(localized: "The publisher's checksum list does not carry a valid signature. The download was not started.")
         case DownloadError.imageSignature:
@@ -303,11 +317,11 @@ extension AppModel {
     }
 
     /// HTTPS GET of a small metadata file, refusing anything larger than the catalog's limit.
-    private static func fetchMetadata(_ url: URL) async throws -> Data {
-        guard url.scheme == "https" else { throw DownloadError.network("insecure URL") }
-        let (bytes, response) = try await downloadSession.bytes(from: url)
+    private static func fetchMetadata(_ request: URLRequest) async throws -> Data {
+        guard let url = request.url, url.scheme == "https" else { throw DownloadError.network("insecure URL") }
+        let (bytes, response) = try await downloadSession.bytes(for: request)
         let status = (response as? HTTPURLResponse)?.statusCode ?? 0
-        guard status == 200 else { throw DownloadError.network("HTTP \(status) for \(url.absoluteString)") }
+        guard status == 200 else { throw DownloadError.network("HTTP \(status) for \(url.host ?? "")\(url.path)") }
         var data = Data()
         for try await b in bytes {
             data.append(b)

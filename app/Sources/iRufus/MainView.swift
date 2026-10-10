@@ -164,11 +164,8 @@ struct DriveOptions: View {
                     Menu {
                         Button("Select…") { showImporter = true }
                         Divider()
-                        Button("Download Ubuntu, SystemRescue, FreeDOS…") { model.openDownloads() }
+                        Button("Download Windows 11, Ubuntu, SystemRescue, FreeDOS…") { model.openDownloads() }
                         Divider()
-                        Button("Download Windows 11 (official Microsoft page)") {
-                            openURL(URL(string: "https://www.microsoft.com/software-download/windows11")!)
-                        }
                         Button("Download Windows 10 (official Microsoft page)") {
                             openURL(URL(string: "https://www.microsoft.com/software-download/windows10ISO")!)
                         }

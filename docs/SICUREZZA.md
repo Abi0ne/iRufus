@@ -63,12 +63,23 @@ Il panic Rust non attraversa l'FFI (`catch_unwind` → `IRUFUS_ERR_INTERNAL`).
 
 ## Rete
 iRufus accede alla rete solo per il controllo degli aggiornamenti e per i download di sistemi operativi chiesti
-dall'utente. Le voci Windows del menu "Scarica" aprono la pagina ufficiale Microsoft nel browser.
+dall'utente. La voce Windows 10 del menu "Scarica" apre la pagina ufficiale Microsoft nel browser.
 
 ### Download di sistemi operativi
 Finestra "Scarica un sistema operativo" (`app/Sources/IrufusCore/Downloads.swift`, `OpenPGP.swift`):
 - solo HTTPS, anche nei redirect (un redirect verso `http:` interrompe la richiesta); sessione effimera,
   user agent `iRufus/<versione>`; niente di diverso da una normale richiesta del browser;
+- **Windows 11** (`WindowsDownload.swift`): dalla pagina `www.microsoft.com/en-us/software-download/windows11`
+  (o `windows11arm64`) si leggono l'ID dell'edizione multi-edizione e la tabella SHA-256 per lingua; poi il protocollo
+  del servizio di download Microsoft, lo stesso di Fido/Rufus (registrazione della sessione su `vlscppe.microsoft.com`,
+  scambio con `ov-df.microsoft.com`, elenco SKU e link da `software-download-connector/api`). Nessuno script viene
+  eseguito: `mdt.js` viene solo letto per estrarre due valori. Si accetta solo un link `https` verso un host
+  `*.microsoft.com` che termini in `.iso`; il token temporaneo del link non entra nel log. La ISO viene accettata solo se
+  il suo SHA-256 coincide con quello pubblicato per quella lingua: senza un valore pubblicato il download non parte.
+  La pagina e la ISO non sono firmate nel loro insieme da Microsoft, quindi la garanzia è quella di HTTPS verso
+  `microsoft.com`, la stessa del controllo manuale con `Get-FileHash` suggerito da Microsoft. Il filtro anti-automazione
+  di Microsoft ("Sentinel", errore 715-123130) può rifiutare la richiesta: iRufus non tenta di aggirarlo, lo dice e
+  propone la pagina ufficiale;
 - **Ubuntu Desktop**: la serie LTS più recente da `changelogs.ubuntu.com/meta-release-lts` (il nome deve essere
   `^[a-z]{2,32}$`), poi `SHA256SUMS` e `SHA256SUMS.gpg` da `releases.ubuntu.com/<serie>/`. La firma è verificata
   in Swift (OpenPGP v4, RSA + SHA-256/384/512, Security.framework) con la sola chiave

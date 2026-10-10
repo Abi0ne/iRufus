@@ -178,7 +178,7 @@ struct DownloadTests {
             "https://releases.ubuntu.com/resolute/SHA256SUMS.gpg": ubuntuSumsSignature,
         ]
         let d = try await DownloadCatalog.resolve(.ubuntuDesktop) { url in
-            guard let data = files[url.absoluteString] else { throw DownloadError.network("404 \(url)") }
+            guard let data = files[url.url!.absoluteString] else { throw DownloadError.network("404 \(url)") }
             return data
         }
         expect(d.url.absoluteString == "https://releases.ubuntu.com/resolute/ubuntu-26.04.1-desktop-amd64.iso")
@@ -187,7 +187,7 @@ struct DownloadTests {
         var tampered = files
         tampered["https://releases.ubuntu.com/resolute/SHA256SUMS"] = Data(String(decoding: ubuntuSums, as: UTF8.self).replacingOccurrences(of: "601e", with: "701e").utf8)
         do {
-            _ = try await DownloadCatalog.resolve(.ubuntuDesktop) { tampered[$0.absoluteString]! }
+            _ = try await DownloadCatalog.resolve(.ubuntuDesktop) { tampered[$0.url!.absoluteString]! }
             fail("a tampered checksum list was accepted")
         } catch DownloadError.signature(.badSignature) {
         } catch {
@@ -201,7 +201,7 @@ struct DownloadTests {
             "https://www.system-rescue.org/releases/13.02/systemrescue-13.02-amd64.iso.asc": systemRescueSignature,
         ]
         let r = try await DownloadCatalog.resolve(.systemRescue) { url in
-            guard let data = sr[url.absoluteString] else { throw DownloadError.network("404 \(url)") }
+            guard let data = sr[url.url!.absoluteString] else { throw DownloadError.network("404 \(url)") }
             return data
         }
         expect(r.url.absoluteString == "https://fastly-cdn.system-rescue.org/releases/13.02/systemrescue-13.02-amd64.iso")
@@ -213,7 +213,7 @@ struct DownloadTests {
         var foreign = sr
         foreign["https://www.system-rescue.org/releases/13.02/systemrescue-13.02-amd64.iso.asc"] = ubuntuSumsSignature
         do {
-            _ = try await DownloadCatalog.resolve(.systemRescue) { foreign[$0.absoluteString]! }
+            _ = try await DownloadCatalog.resolve(.systemRescue) { foreign[$0.url!.absoluteString]! }
             fail("a signature by another key was accepted")
         } catch DownloadError.signature(.unknownKey) {
         } catch {

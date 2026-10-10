@@ -66,7 +66,7 @@ Lo stato effettivo a fine implementazione, con i test associati, è mantenuto in
 | 33 | Salva disco in VHD/DD | vhd.c | Salvataggio raw `.img` e VHD fisso (footer Connectix) | ✅ |
 | 34 | VHDX / FFU | API Windows / DISM | Formati Microsoft senza API su macOS | ⛔ (VHDX 🕓 in lettura) |
 | 35 | Salva unità in ISO (UDF), Dump ottico (Alt-O) | API Windows | Non portato | ⛔ |
-| 36 | Download ISO Windows (Fido) | PowerShell remoto firmato | Fido è PowerShell e Microsoft blocca spesso l'accesso automatizzato; si apre la pagina ufficiale Microsoft | 🔁 |
+| 36 | Download ISO Windows (Fido) | PowerShell remoto firmato | Protocollo di Fido reimplementato in Swift (`WindowsDownload.swift`), senza eseguire script remoti; verifica con lo SHA-256 pubblicato da Microsoft. Se Microsoft rifiuta la richiesta si apre la sua pagina. Windows 10: solo pagina ufficiale | ✅ |
 | 37 | Download UEFI Shell | GitHub pbatard/UEFI-Shell | Rinviato (serve DB di hash fissati come in Rufus) | 🕓 |
 | 38 | Controllo DBX / SBAT revocati | DB embedded + download UEFI.org | Rinviato | 🕓 |
 | 39 | Controllo aggiornamenti | rufus.ie firmato | Release GitHub `Abi0ne/iRufus` con pacchetto firmato Ed25519, installazione automatica alla chiusura | 🔁 |

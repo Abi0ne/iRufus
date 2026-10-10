@@ -1,7 +1,8 @@
 # Changelog
 
 ## Non rilasciato
-- Nuova finestra "Scarica un sistema operativo" (menu SELEZIONA ▾): Ubuntu Desktop (ultima LTS), SystemRescue
+- Nuova finestra "Scarica un sistema operativo" (menu SELEZIONA ▾): Windows 11 x64 e Arm (ultima versione, lingua
+  a scelta, verificata con lo SHA-256 pubblicato da Microsoft), Ubuntu Desktop (ultima LTS), SystemRescue
   (live di soccorso) e FreeDOS 1.4 USB Lite/Full dai server degli editori, con pausa/ripresa e cartella di destinazione a scelta. L'immagine viene
   usata solo dopo la verifica SHA-256: per Ubuntu il checksum viene da `SHA256SUMS` con firma OpenPGP verificata
   con la chiave Ubuntu incorporata, per SystemRescue si verifica anche la firma OpenPGP della ISO stessa, per FreeDOS

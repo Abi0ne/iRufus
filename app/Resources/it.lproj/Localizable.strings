@@ -105,9 +105,8 @@
 "Done: device saved to %@ (SHA-256 %@)." = "Completato: dispositivo salvato in %@ (SHA-256 %@).";
 "Done: the device was overwritten with zeros and verified." = "Completato: il dispositivo è stato azzerato e verificato.";
 "Download" = "Scarica";
-"Download Ubuntu, SystemRescue, FreeDOS…" = "Scarica Ubuntu, SystemRescue, FreeDOS…";
 "Download Windows 10 (official Microsoft page)" = "Scarica Windows 10 (pagina ufficiale Microsoft)";
-"Download Windows 11 (official Microsoft page)" = "Scarica Windows 11 (pagina ufficiale Microsoft)";
+"Download Windows 11, Ubuntu, SystemRescue, FreeDOS…" = "Scarica Windows 11, Ubuntu, SystemRescue, FreeDOS…";
 "Download an Operating System" = "Scarica un sistema operativo";
 "Download and Install" = "Scarica e installa";
 "Download and install updates automatically" = "Scarica e installa automaticamente gli aggiornamenti";
@@ -132,6 +131,7 @@
 "FAT32 is the file system every UEFI firmware must read. NTFS, exFAT and ext are not offered: macOS cannot create them reliably for bootable media." = "FAT32 è il file system che ogni firmware UEFI deve saper leggere. NTFS, exFAT ed ext non sono proposti: macOS non può crearli in modo affidabile per supporti avviabili.";
 "File" = "File";
 "File system" = "File system";
+"For PCs with Arm processors (Snapdragon and others). About 8.5 GB." = "Per PC con processore Arm (Snapdragon e altri). Circa 8,5 GB.";
 "For additional safety, type the device identifier (%@) to continue:" = "Per maggiore sicurezza, digita l'identificatore del dispositivo (%@) per continuare:";
 "Format Options" = "Opzioni formattazione";
 "FreeDOS 1.4 — USB Full" = "FreeDOS 1.4 — USB Full";
@@ -157,6 +157,7 @@
 "Invalid request." = "Richiesta non valida.";
 "It will be installed when you quit iRufus, after the current operation." = "Verrà installato alla chiusura di iRufus, dopo l'operazione in corso.";
 "Keep Working" = "Continua a lavorare";
+"Language" = "Lingua";
 "Language, locale and keyboard; the time zone is not copied. The ISO must include the language." = "Lingua, formati e tastiera; il fuso orario non viene copiato. La ISO deve includere la lingua.";
 "Last check: %@" = "Ultimo controllo: %@";
 "Later" = "Più tardi";
@@ -170,6 +171,7 @@
 "MBR" = "MBR";
 "MBR (from the image)" = "MBR (dall'immagine)";
 "Manufacturer" = "Produttore";
+"Microsoft refused the download request (%@). Microsoft sometimes blocks automated downloads, VPNs and some networks: try again later, or download the ISO from Microsoft's page and select it." = "Microsoft ha rifiutato la richiesta di download (%@). A volte Microsoft blocca i download automatici, le VPN e alcune reti: riprova più tardi, oppure scarica la ISO dalla pagina Microsoft e selezionala.";
 "Model" = "Modello";
 "Never show this device again" = "Non mostrare più questo dispositivo";
 "No" = "No";
@@ -182,7 +184,9 @@
 "Not identified with enough certainty" = "Non identificato con sufficiente certezza";
 "OK" = "OK";
 "Off by default, like in Rufus: external hard drives often hold backups." = "Disattivato per impostazione predefinita, come in Rufus: i dischi esterni contengono spesso backup.";
+"Official multi-edition ISO (Home, Pro, Education…) from Microsoft, latest version. Intel/AMD PCs, about 9 GB." = "ISO ufficiale multi-edizione (Home, Pro, Education…) di Microsoft, ultima versione. PC Intel/AMD, circa 9 GB.";
 "Only removable devices that can be safely identified are listed." = "Vengono elencati solo i dispositivi rimovibili identificabili con certezza.";
+"Open Microsoft's Page" = "Apri la pagina Microsoft";
 "Operating system" = "Sistema operativo";
 "Operation" = "Operazione";
 "Overwrites the entire device with zeros and verifies it. Use it to remove every partition and file system, for example after DD-writing a Linux image." = "Sovrascrive l'intero dispositivo con zeri e lo verifica. Utile per rimuovere ogni partizione e file system, per esempio dopo aver scritto in DD un'immagine Linux.";
@@ -209,6 +213,7 @@
 "Restart now, or it will be installed when you quit iRufus." = "Riavvia ora, oppure verrà installato alla chiusura di iRufus.";
 "Resume" = "Riprendi";
 "SELECT" = "SELEZIONA";
+"SHA-256 published by Microsoft on its download page" = "SHA-256 pubblicato da Microsoft sulla sua pagina di download";
 "START" = "AVVIA";
 "Save as fixed VHD" = "Salva come VHD fisso";
 "Save device to image" = "Salva dispositivo come immagine";
@@ -301,6 +306,8 @@
 "Version %@" = "Versione %@";
 "Virtual APFS container" = "Contenitore APFS virtuale";
 "Volume label" = "Etichetta volume";
+"Windows 11 (64-bit PCs)" = "Windows 11 (PC a 64 bit)";
+"Windows 11 for Arm" = "Windows 11 per Arm";
 "Windows User Experience" = "Esperienza utente Windows";
 "Windows answer file added." = "File di risposta di Windows aggiunto.";
 "Write in DD image mode" = "Scrivi in modalità immagine DD";

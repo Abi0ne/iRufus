@@ -3,11 +3,15 @@
 // HTTPS server and is accepted only if its SHA-256 matches a value that is either
 // pinned here (fixed releases) or read from a checksum list whose OpenPGP signature
 // verifies with a key pinned here, or if the image itself carries such a signature.
+// Windows comes from Microsoft's download service, checked against the SHA-256 that
+// Microsoft publishes on its download page (WindowsDownload.swift).
 // See docs/SICUREZZA.md.
 
 import Foundation
 
 public enum DownloadProduct: String, CaseIterable, Identifiable, Sendable {
+    case windows11
+    case windows11ARM
     case ubuntuDesktop
     case systemRescue
     case freeDOSLite
@@ -15,10 +19,11 @@ public enum DownloadProduct: String, CaseIterable, Identifiable, Sendable {
 
     public var id: String { rawValue }
 
-    public enum Family: Sendable { case linux, dos }
+    public enum Family: Sendable { case windows, linux, dos }
 
     public var family: Family {
         switch self {
+        case .windows11, .windows11ARM: .windows
         case .ubuntuDesktop, .systemRescue: .linux
         case .freeDOSLite, .freeDOSFull: .dos
         }
@@ -27,6 +32,7 @@ public enum DownloadProduct: String, CaseIterable, Identifiable, Sendable {
     /// Host the image and its checksums come from, for display.
     public var publisherHost: String {
         switch self {
+        case .windows11, .windows11ARM: "software.download.prss.microsoft.com"
         case .ubuntuDesktop: "releases.ubuntu.com"
         case .systemRescue: "fastly-cdn.system-rescue.org"
         case .freeDOSLite, .freeDOSFull: "www.ibiblio.org"
@@ -42,6 +48,8 @@ public enum DownloadVerification: Equatable, Sendable {
     case signedImage(keyName: String, fingerprint: String)
     /// Checksum pinned in iRufus for a fixed release.
     case pinnedChecksum
+    /// Checksum published by the vendor on its HTTPS download page (no signature available).
+    case publishedChecksum(page: URL)
 }
 
 public struct ResolvedDownload: Equatable, Sendable {
@@ -54,6 +62,9 @@ public struct ResolvedDownload: Equatable, Sendable {
     public let verification: DownloadVerification
     /// Detached signature of the image, for `.signedImage`.
     public var imageSignature: Data?
+    /// Windows: the languages offered (the image is in `language`).
+    public var languages: [WindowsLanguage] = []
+    public var language: String?
 }
 
 public enum DownloadError: Error, Equatable, Sendable {
@@ -64,7 +75,13 @@ public enum DownloadError: Error, Equatable, Sendable {
     case checksumMismatch
     case imageSignature(OpenPGPError)
     case insufficientSpace(needed: Int64, available: Int64)
+    /// The vendor's service refused the request (Microsoft: error 715-123130 and similar).
+    case refused(String)
 }
+
+/// Metadata fetch: the body of an HTTPS GET, at most `DownloadCatalog.maxMetadataSize` bytes.
+/// Injected so that the resolution can be tested offline.
+public typealias MetadataFetch = (URLRequest) async throws -> Data
 
 public enum DownloadCatalog {
     /// Upper bound for metadata files (release lists, checksum lists, signatures).
@@ -97,15 +114,19 @@ public enum DownloadCatalog {
     static let ubuntuReleases = "https://releases.ubuntu.com"
     static let freeDOSBase = "https://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/distributions/1.4"
 
-    /// Find the image to download. `fetch` returns the body of an HTTPS GET (at most
-    /// `maxMetadataSize` bytes) and is injected so that the resolution can be tested offline.
-    public static func resolve(_ product: DownloadProduct, fetch: (URL) async throws -> Data) async throws -> ResolvedDownload {
+    /// Find the image to download. For Windows, `language` is the English name used by
+    /// Microsoft ("Italian"); nil picks one from the system language.
+    public static func resolve(_ product: DownloadProduct, language: String? = nil,
+                               fetch: MetadataFetch) async throws -> ResolvedDownload {
+        func get(_ url: URL) async throws -> Data { try await fetch(URLRequest(url: url)) }
         switch product {
+        case .windows11, .windows11ARM:
+            return try await WindowsDownload.resolve(product, language: language, fetch: fetch)
         case .ubuntuDesktop:
-            let series = try latestUbuntuLTS(try await fetch(ubuntuMetaRelease))
+            let series = try latestUbuntuLTS(try await get(ubuntuMetaRelease))
             let dir = "\(ubuntuReleases)/\(series)"
-            let sums = try await fetch(URL(string: "\(dir)/SHA256SUMS")!)
-            let sig = try await fetch(URL(string: "\(dir)/SHA256SUMS.gpg")!)
+            let sums = try await get(URL(string: "\(dir)/SHA256SUMS")!)
+            let sig = try await get(URL(string: "\(dir)/SHA256SUMS.gpg")!)
             do {
                 try OpenPGP.verify(detachedSignature: sig, of: sums, keys: [ubuntuKey])
             } catch let e as OpenPGPError {
@@ -116,11 +137,11 @@ public enum DownloadCatalog {
                                     url: URL(string: "\(dir)/\(file)")!, sha256: hash,
                                     verification: .signedChecksums(keyName: ubuntuKey.name, fingerprint: ubuntuKey.fingerprint))
         case .systemRescue:
-            let version = try latestSystemRescue(try await fetch(systemRescueDownloadPage))
+            let version = try latestSystemRescue(try await get(systemRescueDownloadPage))
             let file = "systemrescue-\(version)-amd64.iso"
-            let sums = try parseChecksums(try await fetch(URL(string: "\(systemRescueSite)/\(version)/\(file).sha256")!))
+            let sums = try parseChecksums(try await get(URL(string: "\(systemRescueSite)/\(version)/\(file).sha256")!))
             guard let hash = sums[file] else { throw DownloadError.notFound(file) }
-            let sig = try await fetch(URL(string: "\(systemRescueSite)/\(version)/\(file).asc")!)
+            let sig = try await get(URL(string: "\(systemRescueSite)/\(version)/\(file).asc")!)
             // Reject a signature that iRufus could not check before downloading 1.3 GB.
             do {
                 let parsed = try OpenPGP.parseSignature(try OpenPGP.dearmor(sig))

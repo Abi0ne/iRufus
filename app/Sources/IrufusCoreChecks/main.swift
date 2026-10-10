@@ -39,6 +39,11 @@ import Foundation
     run("downloads: Ubuntu metadata", d.ubuntuMetadataIsParsed)
     run("downloads: SystemRescue metadata", d.systemRescueMetadataIsParsed)
     runAsync("downloads: resolution") { try await DownloadTests().resolutionUsesOnlyVerifiedMetadata() }
+    let w = WindowsDownloadTests()
+    run("windows: page and replies", w.pageAndProtocolRepliesAreParsed)
+    run("windows: refusals and foreign links", w.refusalsAndForeignLinksAreRejected)
+    run("windows: default language", w.defaultLanguageFollowsTheSystem)
+    runAsync("windows: resolution") { try await WindowsDownloadTests().resolutionFollowsTheProtocol() }
     if failures.isEmpty {
         print("All IrufusCore checks passed")
         exit(0)
