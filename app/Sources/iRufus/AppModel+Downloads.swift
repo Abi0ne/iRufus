@@ -391,6 +391,8 @@ final class FileDownload: NSObject, URLSessionDownloadDelegate, @unchecked Senda
         do {
             try? FileManager.default.removeItem(at: staging)
             try FileManager.default.moveItem(at: location, to: staging)
+            // URLSession's temporary file is private (0600); give it the usual permissions of a download.
+            try? FileManager.default.setAttributes([.posixPermissions: 0o644], ofItemAtPath: staging.path)
             finished = staging
         } catch {
             finishError = error
