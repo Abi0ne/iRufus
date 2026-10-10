@@ -53,6 +53,7 @@ struct MainView: View {
         .sheet(item: $model.pending) { op in ConfirmSheet(operation: op) }
         .sheet(item: $advanced) { action in AdvancedSheet(action: action) }
         .sheet(isPresented: $model.showChecksum) { ChecksumSheet() }
+        .sheet(isPresented: $model.download.showSheet) { DownloadSheet() }
         .sheet(isPresented: $model.showWindowsDialog) { WindowsDialog() }
         .sheet(isPresented: $showAbout) { AboutSheet() }
     }
@@ -162,6 +163,8 @@ struct DriveOptions: View {
                     .accessibilityLabel(Text("Checksum"))
                     Menu {
                         Button("Select…") { showImporter = true }
+                        Divider()
+                        Button("Download Ubuntu, SystemRescue, FreeDOS…") { model.openDownloads() }
                         Divider()
                         Button("Download Windows 11 (official Microsoft page)") {
                             openURL(URL(string: "https://www.microsoft.com/software-download/windows11")!)

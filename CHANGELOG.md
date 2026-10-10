@@ -1,5 +1,13 @@
 # Changelog
 
+## Non rilasciato
+- Nuova finestra "Scarica un sistema operativo" (menu SELEZIONA ▾): Ubuntu Desktop (ultima LTS), SystemRescue
+  (live di soccorso) e FreeDOS 1.4 USB Lite/Full dai server degli editori, con pausa/ripresa e cartella di destinazione a scelta. L'immagine viene
+  usata solo dopo la verifica SHA-256: per Ubuntu il checksum viene da `SHA256SUMS` con firma OpenPGP verificata
+  con la chiave Ubuntu incorporata, per SystemRescue si verifica anche la firma OpenPGP della ISO stessa, per FreeDOS
+  è fissato in iRufus. Un file già presente viene verificato invece
+  di essere scaricato di nuovo.
+
 ## 0.1.2 — 2026-10-08
 - Aggiornamenti automatici dalle release GitHub di Abi0ne/iRufus: controllo giornaliero, download,
   verifica della firma Ed25519 e sostituzione dell'app alla chiusura (o con "Riavvia ora").

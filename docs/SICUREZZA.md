@@ -62,8 +62,40 @@ entro la partizione, rilevamento di cicli. Il motore non esegue mai contenuti de
 Il panic Rust non attraversa l'FFI (`catch_unwind` → `IRUFUS_ERR_INTERNAL`).
 
 ## Rete
-Il menu "Scarica" apre solo la pagina ufficiale Microsoft nel browser. L'unico accesso di rete di iRufus
-è il controllo degli aggiornamenti (disattivabile in *Impostazioni › Aggiornamenti*):
+iRufus accede alla rete solo per il controllo degli aggiornamenti e per i download di sistemi operativi chiesti
+dall'utente. Le voci Windows del menu "Scarica" aprono la pagina ufficiale Microsoft nel browser.
+
+### Download di sistemi operativi
+Finestra "Scarica un sistema operativo" (`app/Sources/IrufusCore/Downloads.swift`, `OpenPGP.swift`):
+- solo HTTPS, anche nei redirect (un redirect verso `http:` interrompe la richiesta); sessione effimera,
+  user agent `iRufus/<versione>`; niente di diverso da una normale richiesta del browser;
+- **Ubuntu Desktop**: la serie LTS più recente da `changelogs.ubuntu.com/meta-release-lts` (il nome deve essere
+  `^[a-z]{2,32}$`), poi `SHA256SUMS` e `SHA256SUMS.gpg` da `releases.ubuntu.com/<serie>/`. La firma è verificata
+  in Swift (OpenPGP v4, RSA + SHA-256/384/512, Security.framework) con la sola chiave
+  *Ubuntu CD Image Automatic Signing Key (2012)*, `8439 38DF 228D 22F7 B374 2BC0 D94A A3F0 EFE2 1092`, incorporata
+  come pacchetto della chiave pubblica: l'impronta viene ricalcolata dal pacchetto e confrontata con quella fissata.
+  Firme di altre chiavi, sottopacchetti critici sconosciuti, firme scadute o di tipo testo sono rifiutati;
+- **SystemRescue**: la versione più recente linkata da `www.system-rescue.org/Download/`, mai inferiore a 13.02
+  (una versione vecchia, pur firmata, non viene proposta); `.sha256` e `.asc` da `www.system-rescue.org/releases/<v>/`,
+  la ISO da `fastly-cdn.system-rescue.org`. La firma riguarda la ISO stessa: prima del download si controlla che sia
+  della chiave attesa, dopo il download e lo SHA-256 viene verificata sull'intero file (lettura a blocchi). Chiave
+  fissata: la sottochiave di firma `6298 9046 EB5C 7E98 5ECD F5DD 3B0F EA9B E13C A3C9` di *Francois Dupoux 20210704*
+  (primaria `0FF1 1AF0 81E9 8345 5948 1203 7091 115F 8320 B897`), confrontata tra il sito di SystemRescue e
+  keyserver.ubuntu.com. La sottochiave è l'ancora di fiducia: il legame con la primaria non viene verificato;
+- **FreeDOS 1.4**: release fissa, SHA-256 incorporato in iRufus (da `verify.txt` del progetto), nessuna firma
+  necessaria;
+- file di metadati al massimo 1 MiB; i nomi letti dagli elenchi devono rispettare `^[A-Za-z0-9._+-]+$` e il file
+  finisce sempre nella cartella scelta, mai altrove;
+- il download va in `.<nome>.irufus-part` nella cartella di destinazione; dopo il download il motore calcola lo
+  SHA-256 e il file assume il nome finale **solo se coincide** (e, per le immagini firmate, se la firma è valida),
+  altrimenti viene eliminato. Un file con lo stesso
+  nome già presente viene prima verificato; se non coincide resta al suo posto finché la nuova copia non è
+  verificata;
+- spazio libero controllato prima di iniziare (dimensione annunciata dal server).
+Kali Live non è offerta: Kali la pubblica solo via BitTorrent (nessun mirror HTTP né web seed).
+
+### Aggiornamenti
+Il controllo degli aggiornamenti si può disattivare in *Impostazioni › Aggiornamenti*:
 - al massimo una volta al giorno legge `https://api.github.com/repos/Abi0ne/iRufus/releases/latest`
   (sessione effimera: niente cookie né cache; nessun dato inviato oltre all'indirizzo IP e allo user agent
   `iRufus/<versione>`);

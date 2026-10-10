@@ -57,3 +57,17 @@ func run(_ name: String, _ body: () throws -> Void) {
     do { try body() } catch is RequireFailed {} catch { fail("threw \(error)") }
     print(failures.count == before ? "✔ \(name)" : "✘ \(name)")
 }
+
+/// Like run(_:_:) for async checks; the body runs off the main actor while it waits.
+@MainActor
+func runAsync(_ name: String, _ body: @escaping @Sendable () async throws -> Void) {
+    currentTest = name
+    let before = failures.count
+    let done = DispatchSemaphore(value: 0)
+    Task.detached {
+        do { try await body() } catch is RequireFailed {} catch { fail("threw \(error)") }
+        done.signal()
+    }
+    done.wait()
+    print(failures.count == before ? "✔ \(name)" : "✘ \(name)")
+}

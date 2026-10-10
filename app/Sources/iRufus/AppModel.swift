@@ -83,6 +83,13 @@ final class AppModel {
     var update = UpdateStatus()
     @ObservationIgnored var stagedUpdate: (app: URL, target: URL)?
 
+    // Operating system downloads (AppModel+Downloads.swift)
+    var download = DownloadStatus()
+    @ObservationIgnored var fileDownload: FileDownload?
+    @ObservationIgnored var downloadResumeData: Data?
+    @ObservationIgnored var downloadVerifyCancel: CancelHandle?
+    @ObservationIgnored var downloadGeneration = 0
+
     var settings: AppSettings {
         didSet {
             settings.save()

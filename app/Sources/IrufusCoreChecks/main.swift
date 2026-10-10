@@ -32,6 +32,13 @@ import Foundation
     run("updates: release feed", u.releaseFeedIsParsedStrictly)
     run("updates: signature", u.onlyPackagesSignedWithTheKeyAreAccepted)
     run("updates: staged bundle", u.stagedBundleIsValidated)
+    let d = DownloadTests()
+    run("downloads: pinned keys", d.pinnedKeysMatchTheirFingerprints)
+    run("downloads: Ubuntu signature", d.realUbuntuSignatureVerifies)
+    run("downloads: rejected signatures", d.tamperedOrForeignSignaturesAreRejected)
+    run("downloads: Ubuntu metadata", d.ubuntuMetadataIsParsed)
+    run("downloads: SystemRescue metadata", d.systemRescueMetadataIsParsed)
+    runAsync("downloads: resolution") { try await DownloadTests().resolutionUsesOnlyVerifiedMetadata() }
     if failures.isEmpty {
         print("All IrufusCore checks passed")
         exit(0)

@@ -18,10 +18,11 @@ immagini disco, verificare checksum, testare blocchi difettosi e salvare disposi
 | Scrittura | DD bit per bit con verifica; modalità ISO (GPT o MBR + FAT32, **solo UEFI**) con verifica file per file |
 | Windows | File > 4 GB (split `install.wim`), bypass TPM/Secure Boot/RAM, niente account Microsoft, account locale, privacy, BitLocker, impostazioni regionali |
 | Strumenti | MD5/SHA-1/SHA-256/SHA-512 con confronto, bad blocks e capacità contraffatta, azzeramento, salvataggio in .img/.vhd |
+| Download | Ubuntu Desktop LTS, SystemRescue e FreeDOS dai server ufficiali, con verifica SHA-256 e firma OpenPGP (Ubuntu, SystemRescue), pausa/ripresa |
 | Altro | Log esportabile senza dati personali, impostazioni persistenti, tema chiaro/scuro, italiano e inglese |
 
 Cosa **non** fa (ancora o per scelta) è elencato in [`docs/MATRICE_FUNZIONI.md`](docs/MATRICE_FUNZIONI.md):
-boot loader BIOS in modalità ISO, NTFS/exFAT/ext, persistenza Linux, Windows To Go, VHDX/FFU, download integrati.
+boot loader BIOS in modalità ISO, NTFS/exFAT/ext, persistenza Linux, Windows To Go, VHDX/FFU, download di Windows e macOS.
 
 ## Build rapida
 ```bash

@@ -67,6 +67,11 @@ Legenda: **✅ Supportata** · **🔁 Implementazione diversa** · **⚠️ Limi
 | Azzeramento dispositivo con verifica | ✅ | | R: dd |
 | Salva dispositivo in .img / .vhd | ✅ | Accesso in sola lettura; il file non può stare sul disco letto | R: save |
 | Download ISO Windows | 🔁 | Apre la pagina ufficiale Microsoft; nessuno script remoto | — |
+| Download Ubuntu Desktop (ultima LTS) | ✅ | Solo amd64; versione e SHA-256 da `SHA256SUMS` con firma OpenPGP verificata (chiave Ubuntu fissata); pausa/ripresa | S: downloads |
+| Download FreeDOS 1.4 USB Lite/Full | ✅ | SHA-256 fissato in iRufus (release fissa); immagine DD, solo BIOS/CSM | S: downloads |
+| Download SystemRescue (ultima versione) | ✅ | Solo amd64, versione ≥ 13.02; firma OpenPGP della ISO verificata dopo il download (sottochiave fissata) oltre allo SHA-256; pausa/ripresa | S: downloads |
+| Download Kali Live | ⛔ | Kali distribuisce la ISO live solo via BitTorrent (nessun mirror HTTP né web seed); SystemRescue come alternativa per il recupero | — |
+| Download MS-DOS / PC-DOS | ⛔ | MS-DOS 4.0 (MIT) esiste solo come sorgente e floppy; PC-DOS non è ridistribuibile | — |
 | Aggiornamenti automatici da GitHub (Abi0ne/iRufus) | 🔁 | Pacchetto firmato Ed25519; sostituzione dell'app alla chiusura o con "Riavvia ora" | S: updates |
 | Download UEFI Shell, controllo DBX/SBAT | 🕓 | Nascosti | — |
 | Log consultabile ed esportabile, senza dati personali | ✅ | | S: log |
